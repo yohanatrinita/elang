@@ -6,13 +6,16 @@
     <title>ELANG – Elektronik Arsip Lingkungan</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
+    
     <style>
         html, body {
             height: 100%;
             margin: 0;
             scroll-behavior: smooth;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Interphases Pro DemiBold', sans-serif;
         }
 
         .hero {
@@ -111,14 +114,14 @@
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav me-3">
                     <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/arsip">Arsip</a></li>
                     <li class="nav-item"><a class="nav-link" href="/upload-arsip">Upload Arsip</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/arsip">Arsip</a></li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('arsip.export', ['bulan' => request('bulan'), 'tahun' => request('tahun')]) }}">
                             Download PDF
                         </a>
                     </li>
-                    <li class="nav-item"><a class="nav-link" href="#login-form">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
                 </ul>
             </div>
         </div>

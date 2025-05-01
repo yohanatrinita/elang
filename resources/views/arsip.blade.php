@@ -21,14 +21,13 @@
             </div>
 
             <div class="col-md-3 align-self-end">
-                <button type="submit" class="btn btn-success">🔍</button>
+                <button type="submit" class="btn btn-success"><i class="fa-solid fa-magnifying-glass"></i></button>
             </div>
         </form>
 
         @if(count($arsip))
             <a href="{{ route('arsip.export', ['bulan' => request('bulan'), 'tahun' => request('tahun')]) }}"
-               class="btn btn-danger mb-3" target="_blank">
-                📄 Export PDF
+               class="btn btn-danger mb-3" target="_blank"><i class="fa-solid fa-file-pdf"></i> Export PDF
             </a>
         @endif
 

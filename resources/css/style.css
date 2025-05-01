@@ -7,9 +7,9 @@
 
 /* Global */
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Interphases Pro DemiBold', sans-serif;
     color: #ffffff;
-    background-color: #0f3e28;
+    background-color: #00582f;
 }
 
 /* Container */
@@ -21,7 +21,7 @@ body {
 
 /* Header */
 .main-header {
-    background-color: #0f3e28;
+    /*background-color: #0f3e28;*/
     padding: 15px 0;
 }
 
@@ -124,3 +124,5 @@ body {
 .btn-secondary:hover {
     background-color: #f0f0f0;
 }
+
+

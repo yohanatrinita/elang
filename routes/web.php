@@ -24,3 +24,10 @@ Route::post('/upload-arsip', [ArsipController::class, 'store'])->name('arsip.sto
 
 Route::get('/arsip/export', [ArsipController::class, 'exportPdf'])->name('arsip.export');
 
+use App\Http\Controllers\LoginController;
+
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login.form');
+
+Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
+
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
