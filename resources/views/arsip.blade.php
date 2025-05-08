@@ -1,3 +1,9 @@
+@if (!Auth::check())
+    <script>window.location.href = "{{ route('login') }}";</script>
+    @php exit; @endphp
+@endif
+
+
 @extends('layouts.app')
 
 @section('content')
@@ -81,18 +87,18 @@
                     @forelse ($filtered as $index => $item)
                         <tr>
                             <td class="text-center">{{ $index + 1 }}</td>
-                            <td>{{ $item['pelaku'] }}</td>
-                            <td>{{ $item['jenis'] }}</td>
-                            <td>{{ $item['tanggal'] }}</td>
-                            <td>{{ $item['dokling'] }}</td>
+                            <td>{{ $item['pelaku_usaha'] }}</td>
+                            <td>{{ $item['jenis_usaha'] }}</td>
+                            <td>{{ $item['tanggal_pengawasan'] }}</td>
+                            <td>{{ $item['dokumen_lingkungan'] }}</td>
                             <td>{{ $item['ppa'] }}</td>
                             <td>{{ $item['ppu'] }}</td>
                             <td>{{ $item['plb3'] }}</td>
                             <td>{{ $item['rekomendasi'] }}</td>
-                            <td>{{ $item['tindak'] }}</td>
+                            <td>{{ $item['tindak_lanjut'] }}</td>
                             <td class="text-center">
-                                @if (!empty($item['file']))
-                                    <a href="{{ asset('storage/' . $item['file']) }}" target="_blank" class="btn btn-sm btn-primary">
+                                @if (!empty($item['file_pdf']))
+                                    <a href="{{ asset('storage/' . $item['file_pdf']) }}" target="_blank" class="btn btn-sm btn-primary">
                                         <i class="fas fa-file-pdf"></i>
                                     </a>
                                 @else

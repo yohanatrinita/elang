@@ -113,6 +113,7 @@
 
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav me-3">
+                    <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
                     <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="/upload-arsip">Upload Arsip</a></li>
                     <li class="nav-item"><a class="nav-link" href="/arsip">Arsip</a></li>
@@ -121,11 +122,31 @@
                             Download PDF
                         </a>
                     </li>
-                    <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
+                    @auth
+                        <li class="nav-item">
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="btn btn-link nav-link" style="display: inline; padding: 2; margin: 2;">
+                                    Logout
+                                </button>
+                            </form>
+                        </li>
+                    @else
+                        <li class="nav-item"><a class="nav-link" href="{{ route('login.form') }}">Login</a></li>
+                    @endauth
+
                 </ul>
             </div>
         </div>
     </nav>
+
+
+    @if(session('warning'))
+        <div style="background-color: #fff3cd; color: #856404; padding: 10px; border: 1px solid #ffeeba; margin-bottom: 10px; border-radius: 5px;">
+            ⚠️  {{ session('warning') }}
+        </div>
+    @endif
+
 
     <main>
         @yield('content')

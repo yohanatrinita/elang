@@ -9,15 +9,15 @@
             @csrf
             <div class="col-md-6">
                 <label class="form-label">Pelaku Usaha</label>
-                <input type="text" name="pelaku" class="form-control" required>
+                <input type="text" name="pelaku_usaha" class="form-control" required>
             </div>
             <div class="col-md-6">
                 <label class="form-label">Jenis Usaha/Kegiatan</label>
-                <input type="text" name="jenis" class="form-control" required>
+                <input type="text" name="jenis_usaha" class="form-control" required>
             </div>
             <div class="col-md-3">
                 <label class="form-label">Tanggal Pengawasan</label>
-                <select name="tanggal" class="form-select" required>
+                <select name="tanggal_pengawasan" class="form-select" required>
                     <option value="">Pilih Tanggal</option>
                     @for ($d = 1; $d <= 31; $d++)
                         <option value="{{ $d < 10 ? '0' . $d : $d }}">{{ $d }}</option>
@@ -38,7 +38,7 @@
             </div>
             <div class="col-md-12">
                 <label class="form-label">Dokumen Lingkungan</label>
-                <input type="text" name="dokling" class="form-control" required>
+                <input type="text" name="dokumen_lingkungan" class="form-control" required>
             </div>
             <div class="col-md-4">
                 <label class="form-label">PPA</label>
@@ -58,11 +58,11 @@
             </div>
             <div class="col-md-6">
                 <label class="form-label">Tindak Lanjut</label>
-                <textarea name="tindak" class="form-control" rows="3" required></textarea>
+                <textarea name="tindak_lanjut" class="form-control" rows="3" required></textarea>
             </div>
             <div class="col-md-6">
                 <label class="form-label">Upload File (PDF)</label>
-                <input type="file" name="file" class="form-control" accept=".pdf">
+                <input type="file" name="file_pdf" class="form-control" accept=".pdf">
             </div>
             <div class="col-12 mt-4">
                 <button type="submit" class="btn btn-primary">Simpan Arsip</button>

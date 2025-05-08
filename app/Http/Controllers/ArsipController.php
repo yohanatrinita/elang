@@ -6,18 +6,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use App\Models\Arsip;
 
 class ArsipController extends Controller
 {
     public function index(Request $request)
     {
-        $data = Storage::exists('arsip.json')
-            ? collect(json_decode(Storage::get('arsip.json'), true))
-            : collect([]);
-
-        return view('arsip', [
-            'arsip' => $data->values()->all()
-        ]);
+        $arsip = Arsip::all();
+        return view('arsip', ['arsip' => $arsip]);
     }
 
     public function create()
@@ -28,30 +24,31 @@ class ArsipController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'pelaku' => 'required|string',
-            'jenis' => 'required|string',
-            'tanggal' => 'required|string',
+            'pelaku_usaha' => 'required|string',
+            'jenis_usaha' => 'required|string',
+            'tanggal_pengawasan' => 'required|string',
             'bulan' => 'required|string',
             'tahun' => 'required|numeric',
-            'dokling' => 'required|string',
+            'dokumen_lingkungan' => 'required|string',
             'ppa' => 'required|string',
             'ppu' => 'required|string',
             'plb3' => 'required|string',
             'rekomendasi' => 'required|string',
-            'tindak' => 'required|string',
-            'file' => 'nullable|file|mimes:pdf|max:2048',
+            'tindak_lanjut' => 'required|string',
+            'file_pdf' => 'nullable|file|mimes:pdf|max:2048',
         ]);
 
-        if ($request->hasFile('file')) {
-            $validated['file'] = $request->file('file')->store('arsip', 'public');
-        }
+        // Konversi tanggal jadi YYYY-MM-DD
+        $tanggal = str_pad($validated['tanggal_pengawasan'], 2, '0', STR_PAD_LEFT);
+        $bulan = $this->convertBulan($validated['bulan']);
+        $validated['tanggal_pengawasan'] = "{$validated['tahun']}-{$bulan}-{$tanggal}";
 
-        $data = Storage::exists('arsip.json')
-            ? collect(json_decode(Storage::get('arsip.json'), true))
-            : collect([]);
+        // Upload file
+        if ($request->hasFile('file_pdf')) {
+            $validated['file_pdf'] = $request->file('file_pdf')->store('arsip', 'public');
+        }        
 
-        $data->push($validated);
-        Storage::put('arsip.json', $data->toJson(JSON_PRETTY_PRINT));
+        Arsip::create($validated);
 
         return redirect()->route('arsip')->with('success', 'Data berhasil disimpan.');
     }
@@ -62,23 +59,21 @@ class ArsipController extends Controller
         $akhir = $request->get('tanggal_akhir');
         $cari = $request->get('cari');
 
-        $data = Storage::exists('arsip.json')
-            ? collect(json_decode(Storage::get('arsip.json'), true))
-            : collect([]);
+        $data = Arsip::query();
 
         if ($awal) {
-            $data = $data->where('tanggal', '>=', $awal);
+            $data->where('tanggal_pengawasan', '>=', $awal);
         }
 
         if ($akhir) {
-            $data = $data->where('tanggal', '<=', $akhir);
+            $data->where('tanggal_pengawasan', '<=', $akhir);
         }
 
         if ($cari) {
-            $data = $data->filter(function ($item) use ($cari) {
-                return str_contains(strtolower($item['pelaku']), strtolower($cari));
-            });
+            $data->where('pelaku_usaha', 'like', "%$cari%");
         }
+
+        $data = $data->get();
 
         $judul = 'Rekap Data Pengawasan dari ' .
             ($awal ? Carbon::parse($awal)->translatedFormat('d F Y') : '-') .
@@ -100,53 +95,68 @@ class ArsipController extends Controller
 
     public function edit($id)
     {
-        $data = json_decode(Storage::get('arsip.json'), true);
-        if (!isset($data[$id])) {
-            abort(404);
-        }
-        return view('edit-arsip', ['arsip' => $data[$id], 'id' => $id]);
+        $arsip = Arsip::findOrFail($id);
+        return view('edit-arsip', compact('arsip'));
     }
 
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'pelaku' => 'required|string',
-            'jenis' => 'required|string',
-            'tanggal' => 'required|string',
+            'pelaku_usaha' => 'required|string',
+            'jenis_usaha' => 'required|string',
+            'tanggal_pengawasan' => 'required|string',
             'bulan' => 'required|string',
             'tahun' => 'required|numeric',
-            'dokling' => 'required|string',
+            'dokumen_lingkungan' => 'required|string',
             'ppa' => 'required|string',
             'ppu' => 'required|string',
             'plb3' => 'required|string',
             'rekomendasi' => 'required|string',
-            'tindak' => 'required|string',
-            'file' => 'nullable|file|mimes:pdf|max:2048',
+            'tindak_lanjut' => 'required|string',
+            'file_pdf' => 'nullable|file|mimes:pdf|max:2048',
         ]);
 
-        $arsip = json_decode(Storage::get('arsip.json'), true);
+        // Konversi tanggal jadi YYYY-MM-DD
+        $tanggal = str_pad($validated['tanggal_pengawasan'], 2, '0', STR_PAD_LEFT);
+        $bulan = $this->convertBulan($validated['bulan']);
+        $validated['tanggal_pengawasan'] = "{$validated['tahun']}-{$bulan}-{$tanggal}";
 
-        if ($request->hasFile('file')) {
-            $validated['file'] = $request->file('file')->store('arsip', 'public');
-        } else {
-            $validated['file'] = $arsip[$id]['file'] ?? null;
+        $arsip = Arsip::findOrFail($id);
+
+        if ($request->hasFile('file_pdf')) {
+            $validated['file_pdf'] = $request->file('file_pdf')->store('arsip', 'public');
         }
 
-        $arsip[$id] = $validated;
-        Storage::put('arsip.json', json_encode($arsip, JSON_PRETTY_PRINT));
+        $arsip->update($validated);
 
         return redirect()->route('arsip')->with('success', 'Data berhasil diperbarui.');
     }
 
     public function destroy($id)
     {
-        $arsip = json_decode(Storage::get('arsip.json'), true);
-        if (isset($arsip[$id])) {
-            unset($arsip[$id]);
-            $arsip = array_values($arsip); // reset index
-            Storage::put('arsip.json', json_encode($arsip, JSON_PRETTY_PRINT));
-        }
+        $arsip = Arsip::findOrFail($id);
+        $arsip->delete();
+
         return redirect()->route('arsip')->with('success', 'Data berhasil dihapus.');
     }
 
+    private function convertBulan($bulan)
+    {
+        $bulanList = [
+            'Januari' => '01',
+            'Februari' => '02',
+            'Maret' => '03',
+            'April' => '04',
+            'Mei' => '05',
+            'Juni' => '06',
+            'Juli' => '07',
+            'Agustus' => '08',
+            'September' => '09',
+            'Oktober' => '10',
+            'November' => '11',
+            'Desember' => '12',
+        ];
+
+        return $bulanList[$bulan] ?? '01';
+    }
 }
