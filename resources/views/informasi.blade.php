@@ -24,7 +24,7 @@
             ELANG adalah sistem informasi digital untuk menyimpan, mengelola, dan mengakses dokumen lingkungan hidup dengan mudah dan cepat. 
         Melalui platform ini, Dinas Lingkungan Hidup Kabupaten Bogor berupaya meningkatkan pelayanan publik dengan mengurangi penggunaan kertas, 
         mempercepat pencarian data, serta memastikan keamanan dan keakuratan arsip lingkungan. 
-        Dengan ELANG, seluruh pihak dapat mengakses arsip penting dari mana saja secara aman dan transparan, 
+        Dengan ELANG, seluruh pihak internal dapat mengakses arsip penting dari mana saja secara aman dan transparan, 
         mendukung inisiatif digitalisasi ramah lingkungan dan berkelanjutan.
     </p>
         <div class="row mt-5 fade-in"> 

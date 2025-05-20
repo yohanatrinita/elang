@@ -62,11 +62,11 @@
                             <td class="align-top">{{ $item->jenis_usaha }}</td>
                             <td class="align-top">{{ $item->tanggal_pengawasan }}</td>
                             <td class="align-top">{{ $item->dokumen_lingkungan }}</td>
-                            <td class="align-top">{{ $item->ppa }}</td>
-                            <td class="align-top">{{ $item->ppu }}</td>
-                            <td class="align-top">{{ $item->plb3 }}</td>
-                            <td class="align-top">{{ $item->rekomendasi }}</td>
-                            <td class="align-top">{{ $item->tindak_lanjut }}</td>
+                            <td class="align-top">{!! nl2br(e($item->ppa)) !!}</td>
+                            <td class="align-top">{!! nl2br(e($item->ppu)) !!}</td>
+                            <td class="align-top">{!! nl2br(e($item->plb3)) !!}</td>
+                            <td class="align-top">{!! nl2br(e($item->rekomendasi)) !!}</td>
+                            <td class="align-top">{!! nl2br(e($item->tindak_lanjut)) !!}</td>
                             <td class="text-center align-top">
                                 @if ($item->file_pdf_path)
                                     <a href="{{ asset('storage/' . $item->file_pdf_path) }}" class="btn btn-outline-secondary btn-sm" target="_blank" title="Lihat dan Unduh BA">

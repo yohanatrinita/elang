@@ -58,17 +58,17 @@
             </thead>
             <tbody>
                 @forelse($arsips as $index => $arsip)
-                    <tr>
+                    <tr class="align-top">
                         <td class="text-center">{{ $index + 1 }}</td>
-                        <td>{{ $arsip->pelaku_usaha }}</td>
-                        <td>{{ $arsip->jenis_usaha }}</td>
-                        <td>{{ \Carbon\Carbon::parse($arsip->tanggal_pengawasan)->format('d-m-Y') }}</td>
-                        <td>{{ $arsip->dokumen_lingkungan }}</td>
-                        <td>{!! nl2br(e($arsip->ppa)) !!}</td>
-                        <td>{!! nl2br(e($arsip->ppu)) !!}</td>
-                        <td>{!! nl2br(e($arsip->plb3)) !!}</td>
-                        <td>{!! nl2br(e($arsip->rekomendasi)) !!}</td>
-                        <td>{!! nl2br(e($arsip->tindak_lanjut)) !!}</td>
+                        <td class="align-top">{{ $arsip->pelaku_usaha }}</td>
+                        <td class="align-top">{{ $arsip->jenis_usaha }}</td>
+                        <td class="align-top">{{ \Carbon\Carbon::parse($arsip->tanggal_pengawasan)->format('d-m-Y') }}</td>
+                        <td class="align-top">{{ $arsip->dokumen_lingkungan }}</td>
+                        <td class="align-top">{!! nl2br(e($arsip->ppa)) !!}</td>
+                        <td class="align-top">{!! nl2br(e($arsip->ppu)) !!}</td>
+                        <td class="align-top">{!! nl2br(e($arsip->plb3)) !!}</td>
+                        <td class="align-top">{!! nl2br(e($arsip->rekomendasi)) !!}</td>
+                        <td class="align-top">{!! nl2br(e($arsip->tindak_lanjut)) !!}</td>
                     </tr>
                 @empty
                     <tr>
