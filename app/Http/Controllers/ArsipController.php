@@ -12,8 +12,24 @@ class ArsipController extends Controller
 {
     public function index(Request $request)
     {
-        $arsip = Arsip::all();
-        return view('arsip', ['arsip' => $arsip]);
+        $query = Arsip::query();
+
+        if ($request->filled('cari')) {
+            $cari = $request->cari;
+            $query->where(function ($q) use ($cari) {
+                $q->where('pelaku_usaha', 'like', "%$cari%")
+                    ->orWhere('jenis_usaha', 'like', "%$cari%")
+                    ->orWhere('dokumen_lingkungan', 'like', "%$cari%")
+                    ->orWhere('ppa', 'like', "%$cari%")
+                    ->orWhere('ppu', 'like', "%$cari%")
+                    ->orWhere('plb3', 'like', "%$cari%")
+                    ->orWhere('rekomendasi', 'like', "%$cari%")
+                    ->orWhere('tindak_lanjut', 'like', "%$cari%");
+            });
+        }
+
+        $arsip = $query->latest()->paginate(10);
+        return view('arsip', compact('arsip'));
     }
 
     public function create()
@@ -25,32 +41,114 @@ class ArsipController extends Controller
     {
         $validated = $request->validate([
             'pelaku_usaha' => 'required|string',
+            'alamat' => 'required|string',
             'jenis_usaha' => 'required|string',
-            'tanggal_pengawasan' => 'required|string',
-            'bulan' => 'required|string',
-            'tahun' => 'required|numeric',
+            'tanggal_pengawasan' => 'required|date',
+            'jenis_dokumen_lingkungan' => 'required|string',
             'dokumen_lingkungan' => 'required|string',
             'ppa' => 'required|string',
             'ppu' => 'required|string',
             'plb3' => 'required|string',
             'rekomendasi' => 'required|string',
             'tindak_lanjut' => 'required|string',
-            'file_pdf' => 'nullable|file|mimes:pdf|max:2048',
+            'file_pdf' => 'nullable|file|mimes:pdf|max:10240',
         ]);
 
-        // Konversi tanggal jadi YYYY-MM-DD
-        $tanggal = str_pad($validated['tanggal_pengawasan'], 2, '0', STR_PAD_LEFT);
-        $bulan = $this->convertBulan($validated['bulan']);
-        $validated['tanggal_pengawasan'] = "{$validated['tahun']}-{$bulan}-{$tanggal}";
-
-        // Upload file
         if ($request->hasFile('file_pdf')) {
-            $validated['file_pdf'] = $request->file('file_pdf')->store('arsip', 'public');
-        }        
+            $file = $request->file('file_pdf');
+            $path = $file->store('arsip', 'public');
+            $validated['file_pdf_path'] = $path;
+            $validated['file_pdf_name'] = $file->getClientOriginalName();
+        }
 
         Arsip::create($validated);
-
         return redirect()->route('arsip')->with('success', 'Data berhasil disimpan.');
+    }
+
+    public function edit($id)
+    {
+        $arsip = Arsip::findOrFail($id);
+        return view('edit-arsip', compact('arsip'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'pelaku_usaha' => 'required|string',
+            'alamat' => 'required|string',
+            'jenis_usaha' => 'required|string',
+            'tanggal_pengawasan' => 'required|date',
+            'jenis_dokumen_lingkungan' => 'required|string',
+            'dokumen_lingkungan' => 'required|string',
+            'ppa' => 'required|string',
+            'ppu' => 'required|string',
+            'plb3' => 'required|string',
+            'rekomendasi' => 'required|string',
+            'tindak_lanjut' => 'required|string',
+            'file_pdf' => 'nullable|file|mimes:pdf|max:10240',
+        ]);
+
+        $arsip = Arsip::findOrFail($id);
+
+        if ($request->hasFile('file_pdf')) {
+            $file = $request->file('file_pdf');
+            $path = $file->store('arsip', 'public');
+            $validated['file_pdf_path'] = $path;
+            $validated['file_pdf_name'] = $file->getClientOriginalName();
+        }
+
+        $arsip->update($validated);
+        return redirect()->route('arsip')->with('success', 'Data berhasil diperbarui.');
+    }
+
+    public function destroy($id)
+    {
+        $arsip = Arsip::findOrFail($id);
+        if ($arsip->file_pdf_path && Storage::disk('public')->exists($arsip->file_pdf_path)) {
+            Storage::disk('public')->delete($arsip->file_pdf_path);
+        }
+        $arsip->delete();
+        return redirect()->route('arsip')->with('success', 'Data berhasil dihapus.');
+    }
+
+    public function downloadFile($id)
+    {
+        $arsip = Arsip::findOrFail($id);
+        if (!$arsip->file_pdf_path || !Storage::disk('public')->exists($arsip->file_pdf_path)) {
+            abort(404, 'File tidak ditemukan.');
+        }
+
+        return Storage::disk('public')->download($arsip->file_pdf_path, $arsip->file_pdf_name);
+    }
+
+    public function showPdfFilter(Request $request)
+    {
+        $arsips = Arsip::query();
+
+        if ($request->filled('from') && $request->filled('to')) {
+            $arsips->whereBetween('tanggal_pengawasan', [$request->from, $request->to]);
+        }
+
+        $arsips = $arsips->get();
+
+        return view('arsip-pdf', [
+            'arsips' => $arsips,
+            'judul' => null
+        ]);
+    }
+
+    public function downloadPdf(Request $request)
+    {
+        $arsips = Arsip::query();
+
+        if ($request->filled('from') && $request->filled('to')) {
+            $arsips->whereBetween('tanggal_pengawasan', [$request->from, $request->to]);
+        }
+
+        $arsips = $arsips->get();
+
+        $pdf = Pdf::loadView('arsip-pdf', compact('arsips'))->setPaper('a4', 'landscape');
+        return $pdf->download('rekap_pengawasan.pdf');
     }
 
     public function exportPdf(Request $request)
@@ -80,83 +178,47 @@ class ArsipController extends Controller
             ' sampai ' .
             ($akhir ? Carbon::parse($akhir)->translatedFormat('d F Y') : '-');
 
-        $filename = 'Rekap Data Pengawasan ' .
-            ($awal ? Carbon::parse($awal)->translatedFormat('d F Y') : '-') .
-            ' - ' .
-            ($akhir ? Carbon::parse($akhir)->translatedFormat('d F Y') : '-') . '.pdf';
+        $filename = 'Rekap_Pengawasan_' .
+            ($awal ? Carbon::parse($awal)->format('d-m-Y') : '-') . '_sd_' .
+            ($akhir ? Carbon::parse($akhir)->format('d-m-Y') : '-') . '.pdf';
 
         $pdf = Pdf::loadView('arsip-pdf', [
-            'arsip' => $data->values()->all(),
+            'arsips' => $data,
             'judul' => $judul
         ])->setPaper('a4', 'landscape');
 
         return $pdf->download($filename);
     }
 
-    public function edit($id)
+    public function showRekapFilter()
     {
-        $arsip = Arsip::findOrFail($id);
-        return view('edit-arsip', compact('arsip'));
+        return $this->showPdfFilter(request());
     }
 
-    public function update(Request $request, $id)
+    public function downloadRekap(Request $request)
     {
-        $validated = $request->validate([
-            'pelaku_usaha' => 'required|string',
-            'jenis_usaha' => 'required|string',
-            'tanggal_pengawasan' => 'required|string',
-            'bulan' => 'required|string',
-            'tahun' => 'required|numeric',
-            'dokumen_lingkungan' => 'required|string',
-            'ppa' => 'required|string',
-            'ppu' => 'required|string',
-            'plb3' => 'required|string',
-            'rekomendasi' => 'required|string',
-            'tindak_lanjut' => 'required|string',
-            'file_pdf' => 'nullable|file|mimes:pdf|max:2048',
+        $request->validate([
+            'from' => 'required|date',
+            'to' => 'required|date|after_or_equal:from'
         ]);
 
-        // Konversi tanggal jadi YYYY-MM-DD
-        $tanggal = str_pad($validated['tanggal_pengawasan'], 2, '0', STR_PAD_LEFT);
-        $bulan = $this->convertBulan($validated['bulan']);
-        $validated['tanggal_pengawasan'] = "{$validated['tahun']}-{$bulan}-{$tanggal}";
+        $from = Carbon::parse($request->from);
+        $to = Carbon::parse($request->to);
 
-        $arsip = Arsip::findOrFail($id);
+        $arsips = Arsip::whereBetween('tanggal_pengawasan', [$from, $to])->get();
 
-        if ($request->hasFile('file_pdf')) {
-            $validated['file_pdf'] = $request->file('file_pdf')->store('arsip', 'public');
-        }
+        $judul = 'Rekap Pengawasan Pelaku Usaha ' .
+            $from->translatedFormat('d F Y') . ' - ' .
+            $to->translatedFormat('d F Y');
 
-        $arsip->update($validated);
+        $filename = 'Rekap_Pengawasan_' .
+            $from->format('d-m-Y') . '_sd_' . $to->format('d-m-Y') . '.pdf';
 
-        return redirect()->route('arsip')->with('success', 'Data berhasil diperbarui.');
-    }
+        $pdf = Pdf::loadView('arsip-pdf', [
+            'arsips' => $arsips,
+            'judul' => $judul
+        ])->setPaper('a4', 'landscape');
 
-    public function destroy($id)
-    {
-        $arsip = Arsip::findOrFail($id);
-        $arsip->delete();
-
-        return redirect()->route('arsip')->with('success', 'Data berhasil dihapus.');
-    }
-
-    private function convertBulan($bulan)
-    {
-        $bulanList = [
-            'Januari' => '01',
-            'Februari' => '02',
-            'Maret' => '03',
-            'April' => '04',
-            'Mei' => '05',
-            'Juni' => '06',
-            'Juli' => '07',
-            'Agustus' => '08',
-            'September' => '09',
-            'Oktober' => '10',
-            'November' => '11',
-            'Desember' => '12',
-        ];
-
-        return $bulanList[$bulan] ?? '01';
+        return $pdf->download($filename);
     }
 }

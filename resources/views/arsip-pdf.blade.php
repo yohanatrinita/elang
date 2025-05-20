@@ -1,48 +1,82 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: sans-serif; font-size: 12px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #333; padding: 6px; vertical-align: top; }
-        th { background-color: #f0f0f0; text-align: center; }
-    </style>
-</head>
-<body>
-    <h3 style="text-align:center;">{{ $judul }}</h3>
+@extends('layouts.app')
 
-    <table>
-        <thead>
-            <tr>
-                <th>No.</th>
-                <th>Pelaku Usaha</th>
-                <th>Jenis Usaha</th>
-                <th>Tanggal</th>
-                <th>Dokumen Lingkungan</th>
-                <th>PPA</th>
-                <th>PPU</th>
-                <th>PLB3</th>
-                <th>Rekomendasi</th>
-                <th>Tindak Lanjut</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($arsip as $index => $item)
-            <tr>
-                <td>{{ $index + 1 }}</td>
-                <td>{{ $item['pelaku'] }}</td>
-                <td>{{ $item['jenis'] }}</td>
-                <td>{{ \Carbon\Carbon::parse($item['tanggal'])->translatedFormat('d F Y') }}</td>
-                <td>{!! nl2br(e($item['dokling'])) !!}</td>
-                <td>{!! nl2br(e($item['ppa'])) !!}</td>
-                <td>{!! nl2br(e($item['ppu'])) !!}</td>
-                <td>{!! nl2br(e($item['plb3'])) !!}</td>
-                <td>{!! nl2br(e($item['rekomendasi'])) !!}</td>
-                <td>{!! nl2br(e($item['tindak'])) !!}</td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
-</body>
-</html>
+@section('content')
+<div class="container py-4">
+    <h3 class="mb-4 fw-bold">Rekapitulasi Data Pengawasan</h3>
+
+    <!-- Filter Form -->
+    <form method="GET" action="{{ route('arsip.rekap') }}" class="d-flex align-items-end gap-2 mb-4">
+        <div>
+            <label for="from" class="form-label">Tanggal Awal</label>
+            <input type="date" name="from" id="from" class="form-control" value="{{ request('from') }}">
+        </div>
+        <div>
+            <label for="to" class="form-label">Tanggal Akhir</label>
+            <input type="date" name="to" id="to" class="form-control" value="{{ request('to') }}">
+        </div>
+        <div>
+            <label class="form-label d-block invisible">Cari</label>
+            <button type="submit" class="btn btn-success" title="Cari">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+        @if(request('from') && request('to') && $arsips->count())
+        <div>
+            <label class="form-label d-block invisible">Download</label>
+            <a href="{{ route('arsip.rekap.download', ['from' => request('from'), 'to' => request('to')]) }}"
+               class="btn btn-primary" title="Download Rekap PDF">
+                <i class="fas fa-file-download"></i> Download Rekap
+            </a>
+        </div>
+        @endif
+    </form>
+
+    <!-- Judul Rentang -->
+    @if(isset($judul))
+        <p class="fw-semibold">{{ $judul }}</p>
+    @endif
+
+    <!-- Tabel Rekap -->
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle text-sm">
+            <thead class="table-light text-center align-middle">
+                <tr>
+                    <th rowspan="2">No.</th>
+                    <th rowspan="2">Pelaku Usaha</th>
+                    <th rowspan="2">Jenis Usaha/Kegiatan</th>
+                    <th rowspan="2">Tanggal Pengawasan</th>
+                    <th colspan="4">Hasil Pemeriksaan Lapangan</th>
+                    <th rowspan="2">Rekomendasi</th>
+                    <th rowspan="2">Tindak Lanjut</th>
+                </tr>
+                <tr>
+                    <th>Dokumen Lingkungan</th>
+                    <th>PPA</th>
+                    <th>PPU</th>
+                    <th>PLB3</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($arsips as $index => $arsip)
+                    <tr>
+                        <td class="text-center">{{ $index + 1 }}</td>
+                        <td>{{ $arsip->pelaku_usaha }}</td>
+                        <td>{{ $arsip->jenis_usaha }}</td>
+                        <td>{{ \Carbon\Carbon::parse($arsip->tanggal_pengawasan)->format('d-m-Y') }}</td>
+                        <td>{{ $arsip->dokumen_lingkungan }}</td>
+                        <td>{!! nl2br(e($arsip->ppa)) !!}</td>
+                        <td>{!! nl2br(e($arsip->ppu)) !!}</td>
+                        <td>{!! nl2br(e($arsip->plb3)) !!}</td>
+                        <td>{!! nl2br(e($arsip->rekomendasi)) !!}</td>
+                        <td>{!! nl2br(e($arsip->tindak_lanjut)) !!}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="10" class="text-center">Tidak ada data untuk rentang tanggal yang dipilih.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
+@endsection

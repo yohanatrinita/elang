@@ -9,7 +9,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
-    
     <style>
         html, body {
             height: 100%;
@@ -114,39 +113,33 @@
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav me-3">
                     <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/upload-arsip">Upload Arsip</a></li>
                     <li class="nav-item"><a class="nav-link" href="/arsip">Arsip</a></li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('arsip.export', ['bulan' => request('bulan'), 'tahun' => request('tahun')]) }}">
-                            Download PDF
-                        </a>
+                        <a class="nav-link" href="{{ route('arsip.pdf') }}">Download Rekap</a>
                     </li>
+                    <li class="nav-item"><a class="nav-link" href="/informasi">Informasi</a></li>
                     @auth
-                        <li class="nav-item">
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="btn btn-link nav-link" style="display: inline; padding: 2; margin: 2;">
-                                    Logout
-                                </button>
-                            </form>
-                        </li>
+                    <li class="nav-item">
+                        <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-link nav-link" style="display: inline; padding: 2; margin: 2;">
+                                Logout
+                            </button>
+                        </form>
+                    </li>
                     @else
                         <li class="nav-item"><a class="nav-link" href="{{ route('login.form') }}">Login</a></li>
                     @endauth
-
                 </ul>
             </div>
         </div>
     </nav>
-
 
     @if(session('warning'))
         <div style="background-color: #fff3cd; color: #856404; padding: 10px; border: 1px solid #ffeeba; margin-bottom: 10px; border-radius: 5px;">
             ⚠️  {{ session('warning') }}
         </div>
     @endif
-
 
     <main>
         @yield('content')

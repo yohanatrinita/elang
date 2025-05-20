@@ -3,22 +3,81 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Dashboard;
+use App\Models\Arsip;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $monthlyUploads = Dashboard::selectRaw('MONTH(uploaded_at) as month, COUNT(*) as count')
+        $selectedYear = $request->get('year', now()->year);
+
+        // Get available years based on tanggal_pengawasan
+        $availableYears = Arsip::selectRaw('YEAR(tanggal_pengawasan) as year')
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year');
+
+        // Monthly Supervision by tanggal_pengawasan
+        $monthlyCounts = Arsip::selectRaw('MONTH(tanggal_pengawasan) as month, COUNT(*) as count')
+            ->whereYear('tanggal_pengawasan', $selectedYear)
             ->groupBy('month')
-            ->get();
+            ->pluck('count', 'month');
 
-        $recentUploads = Dashboard::latest()->limit(5)->get();
+        $monthlyUploads = collect(range(1, 12))->mapWithKeys(function ($month) use ($monthlyCounts) {
+            return [$month => $monthlyCounts[$month] ?? 0];
+        });
 
-        $categoryCounts = Dashboard::selectRaw('category, COUNT(*) as count')
-            ->groupBy('category')
-            ->get();
+        // Recent uploads based on tanggal_pengawasan
+        $recentUploads = Arsip::whereYear('tanggal_pengawasan', $selectedYear)
+            ->orderBy('tanggal_pengawasan', 'desc')
+            ->take(5)
+            ->get(['dokumen_lingkungan', 'tanggal_pengawasan', 'created_at']);
 
-        return view('dashboard', compact('monthlyUploads', 'recentUploads', 'categoryCounts'));
+        // Document categories pie chart
+        $defaultCategories = ['Amdal', 'UKL-UPL', 'DELH', 'DPLH', 'Tidak Ada'];
+        $categoryRaw = Arsip::select('jenis_dokumen_lingkungan', DB::raw('COUNT(*) as count'))
+            ->whereYear('tanggal_pengawasan', $selectedYear)
+            ->groupBy('jenis_dokumen_lingkungan')
+            ->pluck('count', 'jenis_dokumen_lingkungan');
+
+        $categoryCounts = collect();
+        foreach ($defaultCategories as $kategori) {
+            $categoryCounts[$kategori] = $categoryRaw[$kategori] ?? 0;
+        }
+
+        // Total arsip tahun ini berdasarkan tanggal_pengawasan
+        $totalYearly = Arsip::whereYear('tanggal_pengawasan', $selectedYear)->count();
+
+        // Kategori terbanyak
+        $topCategory = $categoryCounts->sortDesc()->keys()->first();
+        $topCategoryCount = $categoryCounts[$topCategory];
+
+        // Trend tahunan
+        $yearlyTrend = Arsip::selectRaw('YEAR(tanggal_pengawasan) as year, COUNT(*) as count')
+            ->groupBy('year')
+            ->orderBy('year')
+            ->pluck('count', 'year');
+
+        // Dokumen yang tidak memiliki kategori lengkap
+        $missingDocCount = Arsip::where('jenis_dokumen_lingkungan', 'Tidak Ada')->count();
+
+        // Dokumen yang diunggah hari ini (berdasarkan tanggal_pengawasan == hari ini)
+        $todayCount = Arsip::whereDate('tanggal_pengawasan', today())->count();
+
+        return view('dashboard', compact(
+            'monthlyUploads',
+            'categoryCounts',
+            'yearlyTrend',
+            'recentUploads',
+            'selectedYear',
+            'availableYears',
+            'totalYearly',
+            'topCategory',
+            'topCategoryCount',
+            'missingDocCount',
+            'todayCount'
+        ));
     }
 }

@@ -8,16 +8,18 @@ class Arsip extends Model
 {
     protected $fillable = [
         'pelaku_usaha',
+        'alamat',
         'jenis_usaha',
         'tanggal_pengawasan',
-        'bulan',
-        'tahun',
+        'jenis_dokumen_lingkungan',
         'dokumen_lingkungan',
         'ppa',
         'ppu',
         'plb3',
         'rekomendasi',
         'tindak_lanjut',
-        'file_pdf',
+        'file_pdf_path',
+        'file_pdf_name',
     ];
+
 }
