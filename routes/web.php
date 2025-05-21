@@ -27,6 +27,21 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login.for
 Route::post('/login', [LoginController::class, 'login'])->name('login');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+// 🔒 Proteksi route dengan middleware auth
+Route::middleware(['auth'])->group(function () {
+    Route::get('/informasi', [InformasiController::class, 'index'])->name('informasi');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/arsip', [ArsipController::class, 'index'])->name('arsip');
+    Route::get('/rekap/download', [ArsipController::class, 'download'])->name('rekap.download');
+});
+
+
+Route::middleware(['auth'])->group(function () {
+    // Tambahkan route ini:
+    Route::get('/arsip/rekap/download', [ArsipController::class, 'downloadRekap'])->name('arsip.rekap.download');
+});
+
+
 Route::middleware('auth')->group(function () {
     // Halaman arsip
     Route::get('/arsip', [ArsipController::class, 'index'])->name('arsip');

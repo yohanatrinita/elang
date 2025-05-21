@@ -1,7 +1,5 @@
-
 {{-- Debug session --}}
 {{-- <pre>{{ print_r(session()->all(), true) }}</pre> --}}
-
 
 @extends('layouts.app')
 
@@ -74,9 +72,14 @@
 
         {{-- Flash Message --}}
         @if (session('warning'))
-            <div style="background-color: #fff3cd; color: #856404; padding: 10px; border: 1px solid #ffeeba; margin-bottom: 10px; border-radius: 5px;">
-                ⚠️ {{ session('warning') }}
-            </div>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Peringatan',
+                    text: "{{ session('warning') }}"
+                });
+            </script>
         @endif
 
         {{-- Form Login --}}

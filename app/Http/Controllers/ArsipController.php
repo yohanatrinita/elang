@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use App\Models\Arsip;
+use Illuminate\Support\Facades\DB;
 
 class ArsipController extends Controller
 {
@@ -138,18 +139,28 @@ class ArsipController extends Controller
     }
 
     public function downloadPdf(Request $request)
-    {
-        $arsips = Arsip::query();
+{
+    $request->validate([
+        'from' => 'required|date',
+        'to' => 'required|date|after_or_equal:from'
+    ]);
 
-        if ($request->filled('from') && $request->filled('to')) {
-            $arsips->whereBetween('tanggal_pengawasan', [$request->from, $request->to]);
-        }
+    $from = Carbon::parse($request->from);
+    $to = Carbon::parse($request->to);
 
-        $arsips = $arsips->get();
+    $arsips = Arsip::whereBetween('tanggal_pengawasan', [$from, $to])->get();
 
-        $pdf = Pdf::loadView('arsip-pdf', compact('arsips'))->setPaper('a4', 'landscape');
-        return $pdf->download('rekap_pengawasan.pdf');
-    }
+    $judul = 'Rekap Pengawasan Pelaku Usaha ' . $from->translatedFormat('d F Y') . ' - ' . $to->translatedFormat('d F Y');
+    $filename = $judul . '.pdf';
+
+    $pdf = Pdf::loadView('arsip-pdf', [
+        'arsips' => $arsips,
+        'judul' => $judul
+    ])->setPaper('a4', 'landscape');
+
+    return $pdf->download($filename);
+}
+
 
     public function exportPdf(Request $request)
     {
@@ -197,28 +208,28 @@ class ArsipController extends Controller
 
     public function downloadRekap(Request $request)
     {
-        $request->validate([
-            'from' => 'required|date',
-            'to' => 'required|date|after_or_equal:from'
-        ]);
+        $from = $request->query('from');
+        $to = $request->query('to');
 
-        $from = Carbon::parse($request->from);
-        $to = Carbon::parse($request->to);
+        if (!$from || !$to) {
+            abort(404, 'Tanggal tidak lengkap');
+        }
 
-        $arsips = Arsip::whereBetween('tanggal_pengawasan', [$from, $to])->get();
+        $fromDate = Carbon::parse($from);
+        $toDate = Carbon::parse($to);
 
-        $judul = 'Rekap Pengawasan Pelaku Usaha ' .
-            $from->translatedFormat('d F Y') . ' - ' .
-            $to->translatedFormat('d F Y');
+        $arsips = Arsip::whereBetween(DB::raw('DATE(tanggal_pengawasan)'), [$fromDate, $toDate])->get();
 
-        $filename = 'Rekap_Pengawasan_' .
-            $from->format('d-m-Y') . '_sd_' . $to->format('d-m-Y') . '.pdf';
+        $judul = 'Rekap Pengawasan Pelaku Usaha ' . $fromDate->translatedFormat('d F Y') . ' - ' . $toDate->translatedFormat('d F Y');
+        $filename = $judul . '.pdf';
 
-        $pdf = Pdf::loadView('arsip-pdf', [
+        $pdf = Pdf::loadView('rekap-pdf', [
             'arsips' => $arsips,
-            'judul' => $judul
+            'judul' => $judul,
         ])->setPaper('a4', 'landscape');
 
         return $pdf->download($filename);
     }
+
+
 }

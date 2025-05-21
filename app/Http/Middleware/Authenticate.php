@@ -3,17 +3,20 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
-use Closure;
+use Illuminate\Support\Facades\Redirect;
 
 class Authenticate extends Middleware
 {
+    /**
+     * Get the path the user should be redirected to when they are not authenticated.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return string|null
+     */
     protected function redirectTo($request)
     {
-    if (! $request->expectsJson()) {
-        session()->flash('warning', 'Kamu harus login dulu untuk mengakses halaman ini.');
-        return route('login.form');
+        if (! $request->expectsJson()) {
+            return Redirect::to(route('login.form'))->with('warning', 'Silakan login terlebih dahulu.');
+        }
     }
-    }
-
 }
-

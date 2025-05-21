@@ -5,7 +5,7 @@
     <h3 class="mb-4 fw-bold">Rekapitulasi Data Pengawasan</h3>
 
     <!-- Filter Form -->
-    <form method="GET" action="{{ route('arsip.rekap') }}" class="d-flex align-items-end gap-2 mb-4">
+    <form method="GET" action="{{ route('arsip.pdf') }}" class="d-flex align-items-end gap-2 mb-4">
         <div>
             <label for="from" class="form-label">Tanggal Awal</label>
             <input type="date" name="from" id="from" class="form-control" value="{{ request('from') }}">
@@ -20,12 +20,12 @@
                 <i class="fas fa-search"></i>
             </button>
         </div>
+
         @if(request('from') && request('to') && $arsips->count())
         <div>
             <label class="form-label d-block invisible">Download</label>
-            <a href="{{ route('arsip.rekap.download', ['from' => request('from'), 'to' => request('to')]) }}"
-               class="btn btn-primary" title="Download Rekap PDF">
-                <i class="fas fa-file-download"></i> Download Rekap
+            <a href="{{ route('arsip.rekap.download', ['from' => request('from'), 'to' => request('to')]) }}" class="btn btn-danger">
+                Download Rekap
             </a>
         </div>
         @endif
@@ -58,8 +58,8 @@
             </thead>
             <tbody>
                 @forelse($arsips as $index => $arsip)
-                    <tr class="align-top">
-                        <td class="text-center">{{ $index + 1 }}</td>
+                    <tr>
+                        <td class="text-center align-top">{{ $index + 1 }}</td>
                         <td class="align-top">{{ $arsip->pelaku_usaha }}</td>
                         <td class="align-top">{{ $arsip->jenis_usaha }}</td>
                         <td class="align-top">{{ \Carbon\Carbon::parse($arsip->tanggal_pengawasan)->format('d-m-Y') }}</td>
