@@ -1,43 +1,71 @@
 body {
-    background: #f9f9f9;
-    font-family: 'Segoe UI', sans-serif;
+    color: #ffffff;
+    background-color: #00582f;
+    font-family: 'Interphases Pro DemiBold', sans-serif;
 }
 
-.title {
+.dashboard-title {
     text-align: center;
-    font-size: 32px;
+    font-size: 30px;
     font-weight: bold;
-    color: #2e7d32;
-    margin-bottom: 20px;
+    color: #4a148c;
+    margin-bottom: 30px;
+}
+
+.year-form {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .card {
-    background: #fff;
-    padding: 25px;
-    margin: 30px auto;
-    border-radius: 15px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    max-width: 900px;
+    border-radius: 12px;
 }
 
-.history-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
+.card h6, .card small, .card h2 {
+    color: white;
 }
 
-.history-table th, .history-table td {
-    border: 1px solid #ccc;
-    padding: 10px;
-    text-align: left;
+/* Card Summary Colors */
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #6f42c1, #9f79e9);
+}
+.bg-gradient-success {
+    background: linear-gradient(135deg, #198754, #28a745);
+}
+.bg-gradient-warning {
+    background: linear-gradient(135deg, #ffc107, #ffca2c);
+}
+.bg-gradient-info {
+    background: linear-gradient(135deg, #0dcaf0, #31d2f2);
 }
 
-.history-table th {
-    background-color: #e0f2f1;
-    font-weight: bold;
+/* Chart Card & Table */
+.chart-card, .table-card, .card.p-3, .card.p-4 {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.06);
+    margin-bottom: 20px;
 }
 
+.chart-title, .table-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+/* Canvas Sizing */
 canvas {
     max-width: 100%;
-    margin-top: 15px;
+    height: auto;
+}
+.chart-card canvas {
+    min-height: 300px;
+}
+
+.table thead th {
+    background-color: #f8f9fa;
+    color: #333;
 }

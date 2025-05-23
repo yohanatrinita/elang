@@ -64,7 +64,11 @@ class DashboardController extends Controller
         $missingDocCount = Arsip::where('jenis_dokumen_lingkungan', 'Tidak Ada')->count();
 
         // Dokumen yang diunggah hari ini (berdasarkan tanggal_pengawasan == hari ini)
-        $todayCount = Arsip::whereDate('tanggal_pengawasan', today())->count();
+        $todayDate = Carbon::now('Asia/Jakarta')->toDateString();
+
+        $todayCount = Arsip::whereYear('created_at', $selectedYear)
+                            ->whereDate('created_at', $todayDate)
+                            ->count();
 
         return view('dashboard', compact(
             'monthlyUploads',
