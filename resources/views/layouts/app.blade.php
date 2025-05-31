@@ -117,6 +117,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('arsip.pdf') }}">Download Rekap</a>
                     </li>
+                    @if(auth()->user() && auth()->user()->role === 'admin')
+                    <li class="nav-item"><a href="{{ route('admin.users.index') }}" class="nav-link">Verifikasi User</a></li>
+                    @endif
                     <li class="nav-item"><a class="nav-link" href="/informasi">Informasi</a></li>
                     @auth
                     <li class="nav-item">

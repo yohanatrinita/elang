@@ -27,7 +27,6 @@
             </div>
         </div>
         <div class="col-md-3">
-          <div class="row g-4 mb-4"></div>    
             <div class="card shadow-sm p-1 text-center bg-gradient-success text-black">
                 <h6><i class="fa-solid fa-star me-2"></i>Top Kategori</h6>
                 <small>{{ $topCategory }}</small>
@@ -59,7 +58,7 @@
         <div class="col-md-6">
             <div class="card p-3 shadow-sm" style="height: 400px;">
                 <h5 class="chart-title mb-3"><i class="fa-solid fa-folder-open me-2"></i> Kategori Dokumen</h5>
-                 <canvas id="categoryChart" width="250" height="250"></canvas>
+                <canvas id="categoryChart" width="250" height="250"></canvas>
             </div>
         </div>
     </div>
@@ -74,19 +73,18 @@
                         <th>Nama Dokumen</th>
                         <th>Tanggal</th>
                         <th>Waktu</th>
-                        <th>Diupload</th>
+                        <th>Diupload Oleh</th>
                     </tr>
                 </thead>
                 <tbody>
-                   @foreach ($recentUploads->sortByDesc('created_at') as $doc)
+                    @foreach ($recentUploads->sortByDesc('created_at') as $doc)
                         <tr>
                             <td>{{ $doc->dokumen_lingkungan }}</td>
                             <td>{{ $doc->created_at->format('d-m-Y') }}</td>
-                            <td>{{ $doc->created_at->timezone('Asia/Jakarta')->format('h:i A') }}</td> <!-- 12 jam -->
-                            <td><span class="badge bg-secondary">{{ $doc->created_at->diffForHumans() }}</span></td>
+                            <td>{{ $doc->created_at->timezone('Asia/Jakarta')->format('H:i') }}</td>
+                            <td>{{ $doc->uploader->name ?? '-' }}</td>
                         </tr>
                     @endforeach
-
                 </tbody>
             </table>
         </div>
@@ -122,9 +120,7 @@
                     }
                 }
             }
-
         }
-
     });
 
     new Chart(document.getElementById('categoryChart'), {

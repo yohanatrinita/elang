@@ -20,6 +20,12 @@ class Arsip extends Model
         'tindak_lanjut',
         'file_pdf_path',
         'file_pdf_name',
+        'uploaded_by',
     ];
+
+    public function uploader()
+    {
+        return $this->belongsTo(User::class, 'uploaded_by');
+    }
 
 }

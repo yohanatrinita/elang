@@ -29,11 +29,12 @@ class DashboardController extends Controller
             return [$month => $monthlyCounts[$month] ?? 0];
         });
 
-        // Recent uploads based on tanggal_pengawasan
-        $recentUploads = Arsip::whereYear('tanggal_pengawasan', $selectedYear)
+        // Recent uploads including uploader info
+        $recentUploads = Arsip::with('uploader') // Include uploader relationship
+            ->whereYear('tanggal_pengawasan', $selectedYear)
             ->orderBy('tanggal_pengawasan', 'desc')
             ->take(5)
-            ->get(['dokumen_lingkungan', 'tanggal_pengawasan', 'created_at']);
+            ->get(['dokumen_lingkungan', 'tanggal_pengawasan', 'created_at', 'uploaded_by']);
 
         // Document categories pie chart
         $defaultCategories = ['Amdal', 'UKL-UPL', 'DELH', 'DPLH', 'Tidak Ada'];

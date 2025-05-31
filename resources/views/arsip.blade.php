@@ -43,6 +43,9 @@
                         <th rowspan="2">Rekomendasi</th>
                         <th rowspan="2">Tindak Lanjut</th>
                         <th rowspan="2">Download BA</th>
+                        @if(auth()->user()->isAdmin())
+                            <th rowspan="2">Diunggah oleh</th>
+                        @endif
                         <th colspan="2">Aksi</th>
                     </tr>
                     <tr>
@@ -76,6 +79,11 @@
                                     <span class="text-muted">-</span>
                                 @endif
                             </td>
+                            @if(auth()->user()->isAdmin())
+                                <td class="align-top">
+                                    {{ $item->uploader->name ?? 'Tidak diketahui' }}
+                                </td>
+                            @endif
                             <td class="text-center align-top">
                                 <a href="{{ route('arsip.edit', $item->id) }}" class="btn btn-outline-warning btn-sm" title="Edit">
                                     <i class="fas fa-edit"></i>
@@ -84,6 +92,7 @@
                             <td class="text-center align-top">
                                 <form action="{{ route('arsip.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus data ini?')" class="d-inline-block m-0 p-0">
                                     @csrf
+                                    @method('DELETE')
                                     <button type="submit" class="btn btn-outline-danger btn-sm" title="Hapus">
                                         <i class="fas fa-trash"></i>
                                     </button>
@@ -92,7 +101,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="13" class="text-center">Tidak ada data arsip ditemukan.</td>
+                            <td colspan="14" class="text-center">Tidak ada data arsip ditemukan.</td>
                         </tr>
                     @endforelse
                 </tbody>

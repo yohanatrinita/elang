@@ -1,6 +1,3 @@
-{{-- Debug session --}}
-{{-- <pre>{{ print_r(session()->all(), true) }}</pre> --}}
-
 @extends('layouts.app')
 
 @section('content')
@@ -54,12 +51,10 @@
         background-color: #145c39;
     }
 
-    .login-container .forgot-password {
+    .login-container .register-link {
         margin-top: 15px;
-        display: block;
-        text-align: right;
+        text-align: center;
         font-size: 14px;
-        color: #198754;
     }
 </style>
 
@@ -67,28 +62,34 @@
     <div class="login-container">
         <h2>Login</h2>
 
-        {{-- Debug session --}}
-        {{-- <pre>{{ print_r(session()->all(), true) }}</pre> --}}
-
-        {{-- Flash Message --}}
-        @if (session('warning'))
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            <script>
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Peringatan',
-                    text: "{{ session('warning') }}"
-                });
-            </script>
+        {{-- ✅ Pesan sukses setelah registrasi --}}
+        @if (session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
-        {{-- Form Login --}}
+        {{-- ❌ Error login --}}
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        {{-- 🔐 Form Login --}}
         <form action="/login" method="POST">
             @csrf
             <input type="text" name="email" placeholder="Email" required>
             <input type="password" name="password" placeholder="Password" required>
             <button type="submit">Masuk</button>
         </form>
+
+        {{-- 🔗 Link ke Register --}}
+        <div class="register-link">
+            Belum punya akun? <a href="{{ route('register.form') }}">Daftar di sini</a>
+        </div>
     </div>
 </div>
 @endsection

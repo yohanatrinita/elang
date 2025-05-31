@@ -13,7 +13,7 @@ class ArsipController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Arsip::query();
+        $query = Arsip::with('uploader'); // Eager load relasi uploader
 
         if ($request->filled('cari')) {
             $cari = $request->cari;
@@ -61,6 +61,8 @@ class ArsipController extends Controller
             $validated['file_pdf_path'] = $path;
             $validated['file_pdf_name'] = $file->getClientOriginalName();
         }
+
+        $validated['uploaded_by'] = auth()->id(); // Simpan ID user yang upload
 
         Arsip::create($validated);
         return redirect()->route('arsip')->with('success', 'Data berhasil disimpan.');
@@ -139,28 +141,27 @@ class ArsipController extends Controller
     }
 
     public function downloadPdf(Request $request)
-{
-    $request->validate([
-        'from' => 'required|date',
-        'to' => 'required|date|after_or_equal:from'
-    ]);
+    {
+        $request->validate([
+            'from' => 'required|date',
+            'to' => 'required|date|after_or_equal:from'
+        ]);
 
-    $from = Carbon::parse($request->from);
-    $to = Carbon::parse($request->to);
+        $from = Carbon::parse($request->from);
+        $to = Carbon::parse($request->to);
 
-    $arsips = Arsip::whereBetween('tanggal_pengawasan', [$from, $to])->get();
+        $arsips = Arsip::whereBetween('tanggal_pengawasan', [$from, $to])->get();
 
-    $judul = 'Rekap Pengawasan Pelaku Usaha ' . $from->translatedFormat('d F Y') . ' - ' . $to->translatedFormat('d F Y');
-    $filename = $judul . '.pdf';
+        $judul = 'Rekap Pengawasan Pelaku Usaha ' . $from->translatedFormat('d F Y') . ' - ' . $to->translatedFormat('d F Y');
+        $filename = $judul . '.pdf';
 
-    $pdf = Pdf::loadView('arsip-pdf', [
-        'arsips' => $arsips,
-        'judul' => $judul
-    ])->setPaper('a4', 'landscape');
+        $pdf = Pdf::loadView('arsip-pdf', [
+            'arsips' => $arsips,
+            'judul' => $judul
+        ])->setPaper('a4', 'landscape');
 
-    return $pdf->download($filename);
-}
-
+        return $pdf->download($filename);
+    }
 
     public function exportPdf(Request $request)
     {
@@ -230,6 +231,4 @@ class ArsipController extends Controller
 
         return $pdf->download($filename);
     }
-
-
 }
