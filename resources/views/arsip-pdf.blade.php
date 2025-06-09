@@ -22,13 +22,22 @@
         </div>
 
         @if(request('from') && request('to') && $arsips->count())
-        <div>
-            <label class="form-label d-block invisible">Download</label>
-            <a href="{{ route('arsip.rekap.download', ['from' => request('from'), 'to' => request('to')]) }}" class="btn btn-danger">
-                Download Rekap
-            </a>
+        <div class="ms-auto d-flex gap-2">
+            <div>
+                <label class="form-label d-block invisible">Download PDF</label>
+                <a href="{{ route('arsip.rekap.download', ['from' => request('from'), 'to' => request('to')]) }}" class="btn btn-danger">
+                    <i class="fas fa-file-pdf"></i> PDF
+                </a>
+            </div>
+            <div>
+                <label class="form-label d-block invisible">Download Excel</label>
+                <a href="{{ route('arsip.rekap.excel', ['from' => request('from'), 'to' => request('to')]) }}" class="btn btn-success">
+                    <i class="fas fa-file-excel"></i> Excel
+                </a>
+            </div>
         </div>
         @endif
+
     </form>
 
     <!-- Judul Rentang -->

@@ -8,6 +8,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use App\Models\Arsip;
 use Illuminate\Support\Facades\DB;
+use App\Exports\ArsipExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ArsipController extends Controller
 {
@@ -231,4 +233,19 @@ class ArsipController extends Controller
 
         return $pdf->download($filename);
     }
+
+    public function downloadExcel(Request $request)
+    {
+        $from = $request->query('from');
+        $to = $request->query('to');
+
+        if (!$from || !$to) {
+            return redirect()->back()->with('error', 'Tanggal tidak valid.');
+        }
+
+        $filename = "rekap_arsip_{$from}_sampai_{$to}.xlsx";
+        return Excel::download(new ArsipExport($from, $to), $filename);
+
+    }
+
 }

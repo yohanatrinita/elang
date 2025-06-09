@@ -6,56 +6,126 @@ use App\Models\Arsip;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithColumnWidths;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Font;
+use Maatwebsite\Excel\Events\AfterSheet;
 
-class ArsipExport implements FromCollection, WithHeadings, WithMapping
+class ArsipExport implements FromCollection, WithHeadings, WithMapping, WithStyles, WithColumnWidths, WithEvents
 {
-    protected $year;
+    protected $from;
+    protected $to;
 
-    public function __construct($year)
+    public function __construct($from, $to)
     {
-        $this->year = $year;
+        $this->from = $from;
+        $this->to = $to;
     }
 
     public function collection()
     {
-        return Arsip::whereYear('created_at', $this->year)->get();
+        return Arsip::whereBetween('created_at', [$this->from, $this->to])->get();
     }
 
     public function headings(): array
     {
         return [
-            'Pelaku Usaha',
-            'Alamat',
-            'Jenis Usaha',
-            'Tanggal Pengawasan',
-            'Jenis Dokumen Lingkungan',
-            'Dokumen Lingkungan',
-            'PPA',
-            'PPU',
-            'PLB3',
-            'Rekomendasi',
-            'Tindak Lanjut',
-            'Nama File',
-            'Waktu Upload'
+            ['REKAPITULASI PENGAWASAN ' . date('d F Y', strtotime($this->from)) . ' - ' . date('d F Y', strtotime($this->to))],
+            ['SUBKO PENEGAKAN HUKUM LINGKUNGAN'],
+            ['BIDANG PENEGAKAN HUKUM LINGKUNGAN DAN PENGELOLAAN LIMBAH B3'],
+            ['DINAS LINGKUNGAN HIDUP KABUPATEN BOGOR'],
+            [], // Spacer row
+            [
+                'No.', 'Pelaku Usaha', 'Jenis Usaha/Kegiatan', 'Tanggal Pengawasan',
+                'Dokumen Lingkungan', 'PPA', 'PPU', 'PLB3', 'Rekomendasi', 'Tindak Lanjut'
+            ],
+            // Sub-header baris ke-7, sama seperti baris 6 agar mudah distyling
         ];
     }
 
     public function map($arsip): array
     {
+        static $no = 1;
+
         return [
+            $no++,
             $arsip->pelaku_usaha,
-            $arsip->alamat,
             $arsip->jenis_usaha,
             $arsip->tanggal_pengawasan,
-            $arsip->jenis_dokumen_lingkungan,
             $arsip->dokumen_lingkungan,
             $arsip->ppa,
             $arsip->ppu,
             $arsip->plb3,
             $arsip->rekomendasi,
-            $arsip->tindak_lanjut,
-            $arsip->file_pdf_name,
-            $arsip->created_at->format('d-m-Y H:i')
+            $arsip->tindak_lanjut
+        ];
+    }
+
+    public function styles(Worksheet $sheet)
+    {
+        // Merge header judul
+        $sheet->mergeCells('A1:J1');
+        $sheet->mergeCells('A2:J2');
+        $sheet->mergeCells('A3:J3');
+        $sheet->mergeCells('A4:J4');
+
+        // Style judul
+        for ($i = 1; $i <= 4; $i++) {
+            $sheet->getStyle("A{$i}")->applyFromArray([
+                'font' => ['bold' => true, 'size' => 15],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER]
+            ]);
+        }
+
+        // Header tabel bold & tengah
+        $sheet->getStyle('A6:J6')->getFont()->setBold(true);
+        $sheet->getStyle('A6:J6')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A6:J6')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+
+        return [];
+    }
+
+    public function columnWidths(): array
+    {
+        return [
+            'A' => 5,
+            'B' => 25,
+            'C' => 25,
+            'D' => 18,
+            'E' => 20,
+            'F' => 20,
+            'G' => 20,
+            'H' => 20,
+            'I' => 25,
+            'J' => 25,
+        ];
+    }
+
+    public function registerEvents(): array
+    {
+        return [
+            AfterSheet::class => function (AfterSheet $event) {
+                $count = $this->collection()->count();
+                $startRow = 6;
+                $endRow = $startRow + $count;
+
+                // Border untuk seluruh tabel data
+                $event->sheet->getStyle("A{$startRow}:J{$endRow}")
+                    ->getBorders()
+                    ->getAllBorders()
+                    ->setBorderStyle(Border::BORDER_THIN);
+
+                // Wrap text dan vertical alignment
+                $event->sheet->getStyle("A{$startRow}:J{$endRow}")
+                    ->getAlignment()
+                    ->setWrapText(true)
+                    ->setVertical(Alignment::VERTICAL_TOP);
+            }
         ];
     }
 }

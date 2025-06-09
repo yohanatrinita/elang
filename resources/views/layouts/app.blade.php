@@ -92,6 +92,11 @@
             background: #f8f9fa;
             padding: 20px 0;
         }
+
+        .dropdown-menu .dropdown-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
     </style>
 </head>
 
@@ -116,6 +121,19 @@
                     <li class="nav-item"><a class="nav-link" href="/arsip">Arsip</a></li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('arsip.pdf') }}">Download Rekap</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="rekapDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Data Rekap
+                        </a>
+                        <ul class="dropdown-menu border-0" style="background-color: rgba(21, 115, 71, 0.9);" aria-labelledby="rekapDropdown">
+                            <li><a class="dropdown-item text-white" href="{{ route('rekap.semester') }}">Rekap Laporan Semester</a></li>
+                            <li><a class="dropdown-item text-white" href="{{ route('rekap.pengawasan') }}">Rekap Pengawasan</a></li>
+                            <li><a class="dropdown-item text-white" href="{{ route('rekap.emisi') }}">Rekap Emisi</a></li>
+                            <li><a class="dropdown-item text-white" href="{{ route('rekap.airlimbah') }}">Rekap Air Limbah</a></li>
+                            <li><a class="dropdown-item text-white" href="{{ route('rekap.plb3') }}">Rekap PLB3</a></li>
+                            <li><a class="dropdown-item text-white" href="{{ route('rekap.pernyataan') }}">Rekap Surat Pernyataan</a></li>
+                        </ul>
                     </li>
                     @if(auth()->user() && auth()->user()->role === 'admin')
                     <li class="nav-item"><a href="{{ route('admin.users.index') }}" class="nav-link">Verifikasi User</a></li>
