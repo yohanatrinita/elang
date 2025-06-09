@@ -19,11 +19,42 @@
                 <input type="text" class="form-control" id="pelaku_usaha" name="pelaku_usaha" required>
             </div>
 
+            <div class="form-group">
+                <label for="provinsi">Provinsi</label>
+                <input type="text" class="form-control" id="provinsi" name="provinsi" value="Jawa Barat" readonly>
+            </div>
+
+            <div class="form-group">
+                <label for="kabupaten">Kabupaten</label>
+                <input type="text" class="form-control" id="kabupaten" name="kabupaten" value="Kabupaten Bogor" readonly>
+            </div>
+
+            <!-- Kecamatan -->
+            <div class="mb-3">
+                <label for="kecamatan" class="form-label">Kecamatan</label>
+                <select class="form-select" id="kecamatan" name="kecamatan" required>
+                    <option value="">-- Pilih Kecamatan --</option>
+                    @foreach ($kecamatans as $kecamatan)
+                        <option value="{{ $kecamatan->id }}">{{ $kecamatan->nama }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <!-- Desa -->
+            <div class="mb-3">
+                <label for="desa" class="form-label">Desa/Kelurahan</label>
+                <select class="form-select" id="desa" name="desa" required>
+                    <option value="">-- Pilih Desa/Kelurahan --</option>
+                </select>
+            </div>
+
+
             <!-- Alamat -->
             <div class="mb-3">
-                <label for="alamat" class="form-label">Alamat</label>
+                <label for="alamat" class="form-label">Alamat Lengkap</label>
                 <input type="text" class="form-control" id="alamat" name="alamat" required>
             </div>
+
 
             <!-- Jenis Usaha/Kegiatan -->
             <div class="mb-3">
@@ -113,4 +144,22 @@
         });
     });
 </script>
+
+<script>
+    document.getElementById('kecamatan').addEventListener('change', function () {
+        const kecamatanId = this.value;
+        const desaSelect = document.getElementById('desa');
+        desaSelect.innerHTML = '<option value="">Memuat...</option>';
+
+        fetch(`/get-desa/${kecamatanId}`)
+            .then(response => response.json())
+            .then(data => {
+                desaSelect.innerHTML = '<option value="">-- Pilih Desa/Kelurahan --</option>';
+                data.forEach(desa => {
+                    desaSelect.innerHTML += `<option value="${desa.id}">${desa.nama}</option>`;
+                });
+            });
+    });
+</script>
+
 @endsection

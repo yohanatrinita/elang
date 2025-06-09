@@ -38,6 +38,7 @@
                         <th rowspan="2">No.</th>
                         <th rowspan="2">Pelaku Usaha</th>
                         <th rowspan="2">Jenis Usaha/Kegiatan</th>
+                        <th rowspan="2">Alamat Lengkap</th>
                         <th rowspan="2">Tanggal Pengawasan</th>
                         <th colspan="4">Hasil Pemeriksaan Lapangan</th>
                         <th rowspan="2">Rekomendasi</th>
@@ -63,6 +64,7 @@
                             <td class="align-top text-center">{{ $loop->iteration }}</td>
                             <td class="align-top">{{ $item->pelaku_usaha }}</td>
                             <td class="align-top">{{ $item->jenis_usaha }}</td>
+                            <td class="align-top">{{ $item->alamat }}</td>
                             <td class="align-top">{{ $item->tanggal_pengawasan }}</td>
                             <td class="align-top">{{ $item->dokumen_lingkungan }}</td>
                             <td class="align-top">{!! nl2br(e($item->ppa)) !!}</td>

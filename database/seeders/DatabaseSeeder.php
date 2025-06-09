@@ -14,5 +14,7 @@ class DatabaseSeeder extends Seeder
     {
         // Jalankan seeder admin
         $this->call(AdminUserSeeder::class);
+
+        $this->call(WilayahSeeder::class);
     }
 }

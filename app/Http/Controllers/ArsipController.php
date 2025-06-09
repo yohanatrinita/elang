@@ -10,6 +10,7 @@ use App\Models\Arsip;
 use Illuminate\Support\Facades\DB;
 use App\Exports\ArsipExport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Kecamatan;
 
 class ArsipController extends Controller
 {
@@ -33,12 +34,29 @@ class ArsipController extends Controller
 
         $arsip = $query->latest()->paginate(10);
         return view('arsip', compact('arsip'));
+
+        
     }
 
-    public function create()
+    public function UploadView()
     {
         return view('upload-arsip');
     }
+
+
+    public function getDesaByKecamatan($kecamatanId)
+    {
+        $desa = \App\Models\Desa::where('kecamatan_id', $kecamatanId)->pluck('nama_desa', 'id');
+        return response()->json($desa);
+    }
+
+
+    public function create()
+    {
+        $kecamatans = Kecamatan::all();
+        return view('upload-arsip', compact('kecamatans'));
+    }
+
 
     public function store(Request $request)
     {

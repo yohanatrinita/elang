@@ -60,6 +60,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/upload-arsip', [ArsipController::class, 'create'])->name('arsip.create');
     Route::post('/upload-arsip', [ArsipController::class, 'store'])->name('arsip.store');
 
+    Route::get('/get-desa/{kecamatan_id}', [App\Http\Controllers\WilayahController::class, 'getDesa']);
+    //Route::get('/get-desa/{kecamatan_id}', [ArsipController::class, 'getDesaByKecamatan']);
+
+
+
     Route::get('/arsip/{id}/edit', [ArsipController::class, 'edit'])->name('arsip.edit');
     Route::post('/arsip/{id}/update', [ArsipController::class, 'update'])->name('arsip.update');  
     Route::delete('/arsip/{id}/delete', [ArsipController::class, 'destroy'])->name('arsip.destroy');

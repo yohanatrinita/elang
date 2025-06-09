@@ -56,6 +56,7 @@
                     <th rowspan="2">Tanggal Pengawasan</th>
                     <th colspan="4">Hasil Pemeriksaan Lapangan</th>
                     <th rowspan="2">Rekomendasi</th>
+                    <th rowspan="2">Alamat Lengkap</th>
                     <th rowspan="2">Tindak Lanjut</th>
                 </tr>
                 <tr>
@@ -77,14 +78,16 @@
                         <td class="align-top">{!! nl2br(e($arsip->ppu)) !!}</td>
                         <td class="align-top">{!! nl2br(e($arsip->plb3)) !!}</td>
                         <td class="align-top">{!! nl2br(e($arsip->rekomendasi)) !!}</td>
+                        <td class="align-top">{{ $arsip->alamat }}</td> {{-- ⬅️ Dipindahkan ke sini --}}
                         <td class="align-top">{!! nl2br(e($arsip->tindak_lanjut)) !!}</td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="10" class="text-center">Tidak ada data untuk rentang tanggal yang dipilih.</td>
+                        <td colspan="11" class="text-center">Tidak ada data untuk rentang tanggal yang dipilih.</td>
                     </tr>
                 @endforelse
             </tbody>
+
         </table>
     </div>
 </div>
