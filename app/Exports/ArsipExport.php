@@ -41,7 +41,7 @@ class ArsipExport implements FromCollection, WithHeadings, WithMapping, WithStyl
             ['DINAS LINGKUNGAN HIDUP KABUPATEN BOGOR'],
             [], // Spacer row
             [
-                'No.', 'Pelaku Usaha', 'Jenis Usaha/Kegiatan', 'Tanggal Pengawasan',
+                'No.', 'Pelaku Usaha', 'Jenis Usaha/Kegiatan', 'Alamat Lengkap' ,'Tanggal Pengawasan',
                 'Dokumen Lingkungan', 'PPA', 'PPU', 'PLB3', 'Rekomendasi', 'Tindak Lanjut'
             ],
             // Sub-header baris ke-7, sama seperti baris 6 agar mudah distyling
@@ -56,6 +56,7 @@ class ArsipExport implements FromCollection, WithHeadings, WithMapping, WithStyl
             $no++,
             $arsip->pelaku_usaha,
             $arsip->jenis_usaha,
+            $arsip->alamat,
             $arsip->tanggal_pengawasan,
             $arsip->dokumen_lingkungan,
             $arsip->ppa,
@@ -69,10 +70,11 @@ class ArsipExport implements FromCollection, WithHeadings, WithMapping, WithStyl
     public function styles(Worksheet $sheet)
     {
         // Merge header judul
-        $sheet->mergeCells('A1:J1');
-        $sheet->mergeCells('A2:J2');
-        $sheet->mergeCells('A3:J3');
-        $sheet->mergeCells('A4:J4');
+        $sheet->mergeCells('A1:K1');
+        $sheet->mergeCells('A2:K2');
+        $sheet->mergeCells('A3:K3');
+        $sheet->mergeCells('A4:K4');
+
 
         // Style judul
         for ($i = 1; $i <= 4; $i++) {
@@ -83,9 +85,9 @@ class ArsipExport implements FromCollection, WithHeadings, WithMapping, WithStyl
         }
 
         // Header tabel bold & tengah
-        $sheet->getStyle('A6:J6')->getFont()->setBold(true);
-        $sheet->getStyle('A6:J6')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('A6:J6')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('A6:K6')->getFont()->setBold(true);
+        $sheet->getStyle('A6:K6')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A6:K6')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
         return [];
     }
@@ -103,6 +105,7 @@ class ArsipExport implements FromCollection, WithHeadings, WithMapping, WithStyl
             'H' => 20,
             'I' => 25,
             'J' => 25,
+            'K' => 25,
         ];
     }
 
@@ -115,13 +118,13 @@ class ArsipExport implements FromCollection, WithHeadings, WithMapping, WithStyl
                 $endRow = $startRow + $count;
 
                 // Border untuk seluruh tabel data
-                $event->sheet->getStyle("A{$startRow}:J{$endRow}")
+                $event->sheet->getStyle("A{$startRow}:K{$endRow}")
                     ->getBorders()
                     ->getAllBorders()
                     ->setBorderStyle(Border::BORDER_THIN);
 
                 // Wrap text dan vertical alignment
-                $event->sheet->getStyle("A{$startRow}:J{$endRow}")
+                $event->sheet->getStyle("A{$startRow}:K{$endRow}")
                     ->getAlignment()
                     ->setWrapText(true)
                     ->setVertical(Alignment::VERTICAL_TOP);

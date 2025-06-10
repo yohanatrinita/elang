@@ -63,6 +63,7 @@
                 <th rowspan="2">No</th>
                 <th rowspan="2">Pelaku Usaha</th>
                 <th rowspan="2">Jenis Usaha/Kegiatan</th>
+                <th rowspan="2">Alamat Lengkap</th>
                 <th rowspan="2">Tanggal Pengawasan</th>
                 <th colspan="4">Hasil Pemeriksaan Lapangan</th>
                 <th rowspan="2">Rekomendasi</th>
@@ -81,6 +82,7 @@
                     <td class="center">{{ $index + 1 }}</td>
                     <td>{{ $arsip->pelaku_usaha }}</td>
                     <td>{{ $arsip->jenis_usaha }}</td>
+                    <td class="align-top">{{ $arsip->alamat }}</td>
                     <td class="center">{{ \Carbon\Carbon::parse($arsip->tanggal_pengawasan)->format('d-m-Y') }}</td>
                     <td>{!! nl2br(e($arsip->dokumen_lingkungan)) !!}</td>
                     <td>{!! nl2br(e($arsip->ppa)) !!}</td>
