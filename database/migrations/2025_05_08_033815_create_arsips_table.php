@@ -27,6 +27,7 @@ return new class extends Migration
         $table->string('file_pdf')->nullable();
         $table->timestamps();
     });
+    
 }
 
 };

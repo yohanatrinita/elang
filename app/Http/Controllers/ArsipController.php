@@ -57,7 +57,6 @@ class ArsipController extends Controller
         return view('upload-arsip', compact('kecamatans'));
     }
 
-
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -75,6 +74,9 @@ class ArsipController extends Controller
             'file_pdf' => 'nullable|file|mimes:pdf|max:10240',
         ]);
 
+        // Gabungkan alamat lengkap
+        
+
         if ($request->hasFile('file_pdf')) {
             $file = $request->file('file_pdf');
             $path = $file->store('arsip', 'public');
@@ -91,8 +93,18 @@ class ArsipController extends Controller
     public function edit($id)
     {
         $arsip = Arsip::findOrFail($id);
-        return view('edit-arsip', compact('arsip'));
+
+        // Ambil semua kecamatan
+        $kecamatans = \App\Models\Kecamatan::all();
+
+        // Ambil desa sesuai kecamatan yang dipilih di data arsip
+        $desas = $arsip->kecamatan_id
+            ? \App\Models\Desa::where('kecamatan_id', $arsip->kecamatan_id)->get()
+            : collect(); // kosongkan jika belum ada
+
+        return view('edit-arsip', compact('arsip', 'kecamatans', 'desas'));
     }
+
 
     public function update(Request $request, $id)
     {

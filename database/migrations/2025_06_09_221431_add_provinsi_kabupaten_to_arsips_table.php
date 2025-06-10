@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::table('dokumens', function (Blueprint $table) {
+        Schema::table('arsips', function (Blueprint $table) {
             $table->string('provinsi')->default('Jawa Barat');
             $table->string('kabupaten')->default('Kabupaten Bogor');
         });
@@ -15,7 +15,7 @@ return new class extends Migration {
 
     public function down(): void
     {
-        Schema::table('dokumens', function (Blueprint $table) {
+        Schema::table('arsips', function (Blueprint $table) {
             $table->dropColumn(['provinsi', 'kabupaten']);
         });
     }
