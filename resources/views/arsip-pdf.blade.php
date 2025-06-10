@@ -53,10 +53,10 @@
                     <th rowspan="2">No.</th>
                     <th rowspan="2">Pelaku Usaha</th>
                     <th rowspan="2">Jenis Usaha/Kegiatan</th>
+                    <th rowspan="2">Alamat Lengkap</th>
                     <th rowspan="2">Tanggal Pengawasan</th>
                     <th colspan="4">Hasil Pemeriksaan Lapangan</th>
                     <th rowspan="2">Rekomendasi</th>
-                    <th rowspan="2">Alamat Lengkap</th>
                     <th rowspan="2">Tindak Lanjut</th>
                 </tr>
                 <tr>
@@ -72,13 +72,13 @@
                         <td class="text-center align-top">{{ $index + 1 }}</td>
                         <td class="align-top">{{ $arsip->pelaku_usaha }}</td>
                         <td class="align-top">{{ $arsip->jenis_usaha }}</td>
+                        <td class="align-top">{{ $arsip->alamat }}</td> {{-- ⬅️ Dipindahkan ke sini --}}
                         <td class="align-top">{{ \Carbon\Carbon::parse($arsip->tanggal_pengawasan)->format('d-m-Y') }}</td>
                         <td class="align-top">{{ $arsip->dokumen_lingkungan }}</td>
                         <td class="align-top">{!! nl2br(e($arsip->ppa)) !!}</td>
                         <td class="align-top">{!! nl2br(e($arsip->ppu)) !!}</td>
                         <td class="align-top">{!! nl2br(e($arsip->plb3)) !!}</td>
                         <td class="align-top">{!! nl2br(e($arsip->rekomendasi)) !!}</td>
-                        <td class="align-top">{{ $arsip->alamat }}</td> {{-- ⬅️ Dipindahkan ke sini --}}
                         <td class="align-top">{!! nl2br(e($arsip->tindak_lanjut)) !!}</td>
                     </tr>
                 @empty
