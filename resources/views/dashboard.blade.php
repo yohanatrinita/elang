@@ -2,7 +2,11 @@
 
 @section('content')
 <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+@section('body-class', 'dashboard-body')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+@endpush
 
 <div class="container mt-4">
     <div class="card p-4 mb-4 shadow-sm">
@@ -22,26 +26,26 @@
     <div class="row g-4 mb-4">
         <div class="col-md-3">
             <div class="card shadow-sm p-3 text-center bg-gradient-primary text-black">
-                <h6><i class="fa-solid fa-box-archive me-2"></i>Total Arsip</h6>
+                <h5><i class="fa-solid fa-box-archive me-2"></i>Total Arsip</h5>
                 <h2>{{ $totalYearly }}</h2>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card shadow-sm p-1 text-center bg-gradient-success text-black">
-                <h6><i class="fa-solid fa-star me-2"></i>Top Kategori</h6>
+                <h5><i class="fa-solid fa-star me-2"></i>Top Kategori</h5>
                 <small>{{ $topCategory }}</small>
                 <h2>{{ $topCategoryCount }}</h2>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card shadow-sm p-3 text-center bg-gradient-warning text-black">
-                <h6><i class="fa-solid fa-triangle-exclamation me-2"></i>Dokumen Hilang</h6>
+                <h5><i class="fa-solid fa-triangle-exclamation me-2"></i>Dokumen Hilang</h5>
                 <h2>{{ $missingDocCount }}</h2>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card shadow-sm p-3 text-center bg-gradient-info text-black">
-                <h6><i class="fa-solid fa-cloud-arrow-down me-2"></i>Hari Ini</h6>
+                <h5><i class="fa-solid fa-cloud-arrow-down me-2"></i>Hari Ini</h5>
                 <h2>{{ $todayCount }}</h2>
             </div>
         </div>
@@ -50,15 +54,15 @@
     <!-- Charts -->
     <div class="row g-4 mb-4">
         <div class="col-md-6">
-            <div class="card p-3 shadow-sm">
-                <h5 class="chart-title mb-3"><i class="fa-solid fa-chart-line me-2"></i> Pengawasan Bulanan</h5>
-                <canvas id="monthlyChart" style="height: 300px;"></canvas>
+            <div class="card p-5 shadow-sm">
+                <h3 class="chart-title mb-3"><i class="fa-solid fa-chart-line me-2"></i> Pengawasan Bulanan</h3>
+                <canvas id="monthlyChart" style="height: 400px;"></canvas>
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card p-3 shadow-sm" style="height: 400px;">
+            <div class="card p-5 shadow-sm" style="height: 530px;">
                 <h5 class="chart-title mb-3"><i class="fa-solid fa-folder-open me-2"></i> Kategori Dokumen</h5>
-                <canvas id="categoryChart" width="250" height="250"></canvas>
+                <canvas id="categoryChart" width="250" height="500"></canvas>
             </div>
         </div>
     </div>
@@ -106,7 +110,7 @@
             datasets: [{
                 label: 'banyak dokumen',
                 data: monthlyUploads,
-                backgroundColor: 'rgba(242, 16, 242, 0.7)'
+                backgroundColor: 'rgba(242, 84, 16, 0.7)'
             }]
         },
         options: {

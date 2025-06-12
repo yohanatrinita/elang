@@ -30,11 +30,12 @@ class DashboardController extends Controller
         });
 
         // Recent uploads including uploader info
-        $recentUploads = Arsip::with('uploader') // Include uploader relationship
-            ->whereYear('tanggal_pengawasan', $selectedYear)
-            ->orderBy('tanggal_pengawasan', 'desc')
-            ->take(5)
-            ->get(['dokumen_lingkungan', 'tanggal_pengawasan', 'created_at', 'uploaded_by']);
+        $recentUploads = Arsip::with('uploader')
+        ->whereYear('tanggal_pengawasan', $selectedYear)
+        ->orderBy('tanggal_pengawasan', 'desc')
+        ->take(5)
+        ->get(); // Ambil semua kolom
+
 
         // Document categories pie chart
         $defaultCategories = ['Amdal', 'UKL-UPL', 'DELH', 'DPLH', 'Tidak Ada'];

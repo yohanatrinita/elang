@@ -33,20 +33,23 @@ class ArsipExport implements FromCollection, WithHeadings, WithMapping, WithStyl
     }
 
     public function headings(): array
-    {
-        return [
-            ['REKAPITULASI PENGAWASAN ' . date('d F Y', strtotime($this->from)) . ' - ' . date('d F Y', strtotime($this->to))],
-            ['SUBKO PENEGAKAN HUKUM LINGKUNGAN'],
-            ['BIDANG PENEGAKAN HUKUM LINGKUNGAN DAN PENGELOLAAN LIMBAH B3'],
-            ['DINAS LINGKUNGAN HIDUP KABUPATEN BOGOR'],
-            [], // Spacer row
-            [
-                'No.', 'Pelaku Usaha', 'Jenis Usaha/Kegiatan', 'Alamat Lengkap' ,'Tanggal Pengawasan',
-                'Dokumen Lingkungan', 'PPA', 'PPU', 'PLB3', 'Rekomendasi', 'Tindak Lanjut'
-            ],
-            // Sub-header baris ke-7, sama seperti baris 6 agar mudah distyling
-        ];
-    }
+{
+    return [
+        ['REKAPITULASI PENGAWASAN ' . date('d F Y', strtotime($this->from)) . ' - ' . date('d F Y', strtotime($this->to))],
+        ['SUBKO PENEGAKAN HUKUM LINGKUNGAN'],
+        ['BIDANG PENEGAKAN HUKUM LINGKUNGAN DAN PENGELOLAAN LIMBAH B3'],
+        ['DINAS LINGKUNGAN HIDUP KABUPATEN BOGOR'],
+        [], // Spacer row (baris 5)
+        [ // Baris 6 (header utama)
+            'No.', 'Pelaku Usaha', 'Jenis Usaha/Kegiatan', 'Alamat Lengkap', 'Tanggal Pengawasan',
+            'Hasil Pemeriksaan Lapangan', '', '', '', 'Rekomendasi', 'Tindak Lanjut'
+        ],
+        [ // Baris 7 (sub-header)
+            '', '', '', '', '',
+            'Dokumen Lingkungan', 'PPA', 'PPU', 'PLB3', '', ''
+        ],
+    ];
+}
 
     public function map($arsip): array
     {
@@ -74,6 +77,11 @@ class ArsipExport implements FromCollection, WithHeadings, WithMapping, WithStyl
         $sheet->mergeCells('A2:K2');
         $sheet->mergeCells('A3:K3');
         $sheet->mergeCells('A4:K4');
+        // Header tabel bold & tengah
+$sheet->getStyle('A6:K7')->getFont()->setBold(true);
+$sheet->getStyle('A6:K7')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+$sheet->getStyle('A6:K7')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+
 
 
         // Style judul
@@ -110,25 +118,43 @@ class ArsipExport implements FromCollection, WithHeadings, WithMapping, WithStyl
     }
 
     public function registerEvents(): array
-    {
-        return [
-            AfterSheet::class => function (AfterSheet $event) {
-                $count = $this->collection()->count();
-                $startRow = 6;
-                $endRow = $startRow + $count;
+{
+    return [
+        AfterSheet::class => function (AfterSheet $event) {
+            $sheet = $event->sheet;
 
-                // Border untuk seluruh tabel data
-                $event->sheet->getStyle("A{$startRow}:K{$endRow}")
-                    ->getBorders()
-                    ->getAllBorders()
-                    ->setBorderStyle(Border::BORDER_THIN);
+            // Baris awal data setelah header dua baris (baris 6 dan 7)
+            $dataStartRow = 6;
 
-                // Wrap text dan vertical alignment
-                $event->sheet->getStyle("A{$startRow}:K{$endRow}")
-                    ->getAlignment()
-                    ->setWrapText(true)
-                    ->setVertical(Alignment::VERTICAL_TOP);
-            }
-        ];
-    }
+            // Hitung total baris data
+            $dataCount = $this->collection()->count();
+
+            // Baris akhir data
+            $dataEndRow = $dataStartRow + $dataCount - (-1);
+
+            // Terapkan border ke semua kolom dan baris data
+            $sheet->getStyle("A{$dataStartRow}:K{$dataEndRow}")
+                ->getBorders()
+                ->getAllBorders()
+                ->setBorderStyle(Border::BORDER_THIN);
+
+            // Wrap text dan vertical alignment
+            $sheet->getStyle("A{$dataStartRow}:K{$dataEndRow}")
+                ->getAlignment()
+                ->setWrapText(true)
+                ->setVertical(Alignment::VERTICAL_TOP);
+
+            // Merge header bertingkat (baris 6 dan 7)
+            $sheet->mergeCells('A6:A7'); // No.
+            $sheet->mergeCells('B6:B7'); // Pelaku Usaha
+            $sheet->mergeCells('C6:C7'); // Jenis Usaha
+            $sheet->mergeCells('D6:D7'); // Alamat
+            $sheet->mergeCells('E6:E7'); // Tanggal Pengawasan
+            $sheet->mergeCells('F6:I6'); // Hasil Pemeriksaan Lapangan
+            $sheet->mergeCells('J6:J7'); // Rekomendasi
+            $sheet->mergeCells('K6:K7'); // Tindak Lanjut
+        }
+    ];
+}
+
 }

@@ -1,14 +1,23 @@
 body {
-    color: #ffffff;
-    background-color: #00582f;
+    color: #000000;
     font-family: 'Interphases Pro DemiBold', sans-serif;
+    background: linear-gradient(135deg, #e0f7fa, #f1f8e9);
+    background-size: 400% 400%;
+    animation: gradientBackground 15s ease infinite;
 }
+
+@keyframes gradientBackground {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+}
+
 
 .dashboard-title {
     text-align: center;
     font-size: 30px;
     font-weight: bold;
-    color: #4a148c;
+    color: #000000;
     margin-bottom: 30px;
 }
 
@@ -23,10 +32,10 @@ body {
 }
 
 .card h6, .card small, .card h2 {
-    color: white;
+    color: rgb(0, 0, 0);
 }
 
-/* Card Summary Colors */
+/* Card Summary Colors =
 .bg-gradient-primary {
     background: linear-gradient(135deg, #6f42c1, #9f79e9);
 }
@@ -38,7 +47,7 @@ body {
 }
 .bg-gradient-info {
     background: linear-gradient(135deg, #0dcaf0, #31d2f2);
-}
+}*/
 
 /* Chart Card & Table */
 .chart-card, .table-card, .card.p-3, .card.p-4 {

@@ -253,15 +253,22 @@ class ArsipController extends Controller
     }
 
     public function downloadExcel(Request $request)
-    {
-        $from = $request->query('from');
-        $to = $request->query('to');
+{
+    $from = $request->query('from');
+    $to = $request->query('to');
 
-        if (!$from || !$to) {
-            return redirect()->back()->with('error', 'Tanggal tidak valid.');
-        }
-
-        $filename = "rekap_arsip_{$from}_sampai_{$to}.xlsx";
-        return Excel::download(new ArsipExport($from, $to), $filename);
+    if (!$from || !$to) {
+        return redirect()->back()->with('error', 'Tanggal tidak valid.');
     }
+
+    $fromDate = Carbon::parse($from);
+    $toDate = Carbon::parse($to);
+
+    // Sama seperti yang digunakan di fungsi downloadRekap PDF
+    $judul = 'Rekap Pengawasan Pelaku Usaha ' . $fromDate->translatedFormat('d F Y') . ' - ' . $toDate->translatedFormat('d F Y');
+    $filename = $judul . '.xlsx';
+
+    return Excel::download(new ArsipExport($from, $to), $filename);
+}
+
 }
