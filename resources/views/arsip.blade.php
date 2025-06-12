@@ -15,7 +15,6 @@
 
         <form method="GET" class="row g-3 mb-4 align-items-end">
             <div class="col-md-6">
-                <label class="form-label">Cari Data</label>
                 <input type="text" name="cari" class="form-control" placeholder="Cari Data..." value="{{ request('cari') }}">
             </div>
             <div class="col-md-2">
@@ -59,12 +58,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($arsip as $item)
+                    @forelse ($arsips as $item)
                         <tr>
-                            <td class="align-top text-center">{{ $loop->iteration }}</td>
+                            <td class="align-top text-center">{{ $arsips->firstItem() + $loop->index }}</td>
                             <td class="align-top">{{ $item->pelaku_usaha }}</td>
                             <td class="align-top">{{ $item->jenis_usaha }}</td>
-                            <td class="align-top">{{ $item->alamat }}</td>
+                            <td class="align-top">
+                                {{ $item->alamat }},
+                                {{ $item->desa->nama ?? '-' }},
+                                Kecamatan {{ $item->desa->kecamatan->nama ?? '-' }},
+                                Kabupaten Bogor,
+                                Provinsi Jawa Barat
+                            </td>
                             <td class="align-top">{{ $item->tanggal_pengawasan }}</td>
                             <td class="align-top">{{ $item->dokumen_lingkungan }}</td>
                             <td class="align-top">{!! nl2br(e($item->ppa)) !!}</td>
@@ -74,11 +79,14 @@
                             <td class="align-top">{!! nl2br(e($item->tindak_lanjut)) !!}</td>
                             <td class="text-center align-top">
                                 @if ($item->file_pdf_path)
-                                    <a href="{{ asset('storage/' . $item->file_pdf_path) }}" class="btn btn-outline-secondary btn-sm" target="_blank" title="Lihat dan Unduh BA">
+                                    <a href="{{ asset('storage/' . $item->file_pdf_path) }}"
+                                    target="_blank"
+                                    title="Download"
+                                    class="btn btn-outline-primary btn-sm">
                                         <i class="fas fa-download"></i>
                                     </a>
                                 @else
-                                    <span class="text-muted">-</span>
+                                    -
                                 @endif
                             </td>
                             @if(auth()->user()->isAdmin())
@@ -92,12 +100,19 @@
                                 </a>
                             </td>
                             <td class="text-center align-top">
-                                <form action="{{ route('arsip.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus data ini?')" class="d-inline-block m-0 p-0">
+                                <button type="button"
+                                        class="btn btn-outline-danger btn-sm swal-delete"
+                                        data-id="{{ $item->id }}"
+                                        title="Hapus">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+
+                                <form id="delete-form-{{ $item->id }}"
+                                    action="{{ route('arsip.destroy', $item->id) }}"
+                                    method="POST"
+                                    class="d-none">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Hapus">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
                                 </form>
                             </td>
                         </tr>
@@ -110,9 +125,41 @@
             </table>
         </div>
 
-        <div class="mt-3">
-            {{ $arsip->withQueryString()->links() }}
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <div>
+                Menampilkan {{ $arsips->firstItem() }} - {{ $arsips->lastItem() }} dari total {{ $arsips->total() }} data
+            </div>
+            <div>
+                {{ $arsips->withQueryString()->links('pagination::bootstrap-5') }}
+            </div>
         </div>
     </div>
 </section>
 @endsection
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.swal-delete').forEach(button => {
+            button.addEventListener('click', function () {
+                const id = this.getAttribute('data-id');
+                Swal.fire({
+                    title: 'Hapus data ini?',
+                    text: 'Data yang dihapus tidak bisa dikembalikan!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Ya, hapus',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById(`delete-form-${id}`).submit();
+                    }
+                });
+            });
+        });
+    });
+</script>
+@endpush

@@ -72,7 +72,7 @@
                         <td class="text-center align-top">{{ $index + 1 }}</td>
                         <td class="align-top">{{ $arsip->pelaku_usaha }}</td>
                         <td class="align-top">{{ $arsip->jenis_usaha }}</td>
-                        <td class="align-top">{{ $arsip->alamat }}</td> {{-- ⬅️ Dipindahkan ke sini --}}
+                        <td class="align-top">{{ $arsip->alamat }}</td> 
                         <td class="align-top">{{ \Carbon\Carbon::parse($arsip->tanggal_pengawasan)->format('d-m-Y') }}</td>
                         <td class="align-top">{{ $arsip->dokumen_lingkungan }}</td>
                         <td class="align-top">{!! nl2br(e($arsip->ppa)) !!}</td>

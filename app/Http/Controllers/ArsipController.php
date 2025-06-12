@@ -7,16 +7,17 @@ use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use App\Models\Arsip;
+use App\Models\Desa;
+use App\Models\Kecamatan;
 use Illuminate\Support\Facades\DB;
 use App\Exports\ArsipExport;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Models\Kecamatan;
 
 class ArsipController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Arsip::with('uploader'); // Eager load relasi uploader
+        $query = Arsip::with(['uploader', 'desa.kecamatan']);
 
         if ($request->filled('cari')) {
             $cari = $request->cari;
@@ -32,10 +33,8 @@ class ArsipController extends Controller
             });
         }
 
-        $arsip = $query->latest()->paginate(10);
-        return view('arsip', compact('arsip'));
-
-        
+        $arsips = $query->latest()->paginate(15);
+        return view('arsip', compact('arsips'));
     }
 
     public function UploadView()
@@ -43,23 +42,22 @@ class ArsipController extends Controller
         return view('upload-arsip');
     }
 
-
     public function getDesaByKecamatan($kecamatanId)
     {
-        $desa = \App\Models\Desa::where('kecamatan_id', $kecamatanId)->pluck('nama_desa', 'id');
+        $desa = Desa::where('kecamatan_id', $kecamatanId)->get(['id', 'nama']);
         return response()->json($desa);
     }
 
-
     public function create()
     {
-        $kecamatans = Kecamatan::all();
+        $kecamatans = Kecamatan::orderBy('nama')->get();
         return view('upload-arsip', compact('kecamatans'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'desa_id' => 'required|exists:desas,id',
             'pelaku_usaha' => 'required|string',
             'alamat' => 'required|string',
             'jenis_usaha' => 'required|string',
@@ -74,8 +72,7 @@ class ArsipController extends Controller
             'file_pdf' => 'nullable|file|mimes:pdf|max:10240',
         ]);
 
-        // Gabungkan alamat lengkap
-        
+        $validated['uploaded_by'] = auth()->id();
 
         if ($request->hasFile('file_pdf')) {
             $file = $request->file('file_pdf');
@@ -84,31 +81,23 @@ class ArsipController extends Controller
             $validated['file_pdf_name'] = $file->getClientOriginalName();
         }
 
-        $validated['uploaded_by'] = auth()->id(); // Simpan ID user yang upload
-
         Arsip::create($validated);
         return redirect()->route('arsip')->with('success', 'Data berhasil disimpan.');
     }
 
     public function edit($id)
     {
-        $arsip = Arsip::findOrFail($id);
-
-        // Ambil semua kecamatan
-        $kecamatans = \App\Models\Kecamatan::all();
-
-        // Ambil desa sesuai kecamatan yang dipilih di data arsip
-        $desas = $arsip->kecamatan_id
-            ? \App\Models\Desa::where('kecamatan_id', $arsip->kecamatan_id)->get()
-            : collect(); // kosongkan jika belum ada
+        $arsip = Arsip::with('desa.kecamatan')->findOrFail($id);
+        $kecamatans = Kecamatan::orderBy('nama')->get();
+        $desas = $arsip->desa ? Desa::where('kecamatan_id', $arsip->desa->kecamatan_id)->get() : collect();
 
         return view('edit-arsip', compact('arsip', 'kecamatans', 'desas'));
     }
 
-
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
+            'desa_id' => 'required|exists:desas,id',
             'pelaku_usaha' => 'required|string',
             'alamat' => 'required|string',
             'jenis_usaha' => 'required|string',
@@ -218,8 +207,7 @@ class ArsipController extends Controller
         $data = $data->get();
 
         $judul = 'Rekap Data Pengawasan dari ' .
-            ($awal ? Carbon::parse($awal)->translatedFormat('d F Y') : '-') .
-            ' sampai ' .
+            ($awal ? Carbon::parse($awal)->translatedFormat('d F Y') : '-') . ' sampai ' .
             ($akhir ? Carbon::parse($akhir)->translatedFormat('d F Y') : '-');
 
         $filename = 'Rekap_Pengawasan_' .
@@ -275,7 +263,5 @@ class ArsipController extends Controller
 
         $filename = "rekap_arsip_{$from}_sampai_{$to}.xlsx";
         return Excel::download(new ArsipExport($from, $to), $filename);
-
     }
-
 }

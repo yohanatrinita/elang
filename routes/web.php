@@ -38,48 +38,44 @@ Route::prefix('rekap')->group(function () {
     Route::get('/pernyataan', [RekapController::class, 'pernyataan'])->name('rekap.pernyataan');
 });
 
-
-Route::prefix('rekap/semester')->middleware(['auth'])->group(function () {
-    Route::get('/', [SemesterReportController::class, 'index'])->name('rekap.semester');
-    Route::get('/create', [SemesterReportController::class, 'create'])->name('rekap.semester.create');
-    Route::post('/', [SemesterReportController::class, 'store'])->name('rekap.semester.store');
-    Route::get('/{id}/edit', [SemesterReportController::class, 'edit'])->name('rekap.semester.edit');
-    Route::put('/{id}', [SemesterReportController::class, 'update'])->name('rekap.semester.update');
-    Route::delete('/{id}', [SemesterReportController::class, 'destroy'])->name('rekap.semester.destroy');
-});
-
-
 // 🔒 Authenticated Routes (All roles)
 Route::middleware(['auth'])->group(function () {
 
+    // 📊 Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // ℹ️ Informasi
     Route::get('/informasi', [InformasiController::class, 'index'])->name('informasi');
 
-    // 📁 Arsip
-    Route::get('/arsip', [ArsipController::class, 'index'])->name('arsip');
-    Route::get('/upload-arsip', [ArsipController::class, 'create'])->name('arsip.create');
-    Route::post('/upload-arsip', [ArsipController::class, 'store'])->name('arsip.store');
+    // 📁 Arsip (CRUD dan Ekspor)
+    Route::prefix('arsip')->group(function () {
+        Route::get('/', [ArsipController::class, 'index'])->name('arsip');
+        Route::get('/create', [ArsipController::class, 'create'])->name('arsip.create');
+        Route::post('/create', [ArsipController::class, 'store'])->name('arsip.store');
 
-    Route::get('/get-desa/{kecamatan_id}', [App\Http\Controllers\WilayahController::class, 'getDesa']);
-    //Route::get('/get-desa/{kecamatan_id}', [ArsipController::class, 'getDesaByKecamatan']);
+        Route::get('/{id}/edit', [ArsipController::class, 'edit'])->name('arsip.edit');
+        //Route::put('/{id}', [ArsipController::class, 'update'])->name('arsip.update');
+        Route::put('arsip/{id}', [ArsipController::class, 'update'])->name('arsip.update');
+        Route::delete('/{id}/delete', [ArsipController::class, 'destroy'])->name('arsip.destroy');
+        Route::get('/{id}/download', [ArsipController::class, 'downloadFile'])->name('arsip.download');
 
+        // 📤 Ekspor & PDF
+        Route::get('/export', [ArsipController::class, 'exportPdf'])->name('arsip.export');
+        Route::get('/pdf', [ArsipController::class, 'showPdfFilter'])->name('arsip.pdf');
+        Route::get('/pdf/download', [ArsipController::class, 'downloadPdf'])->name('arsip.pdf.download');
+        Route::get('/rekap', [ArsipController::class, 'showRekapFilter'])->name('arsip.rekap');
+    });
 
-
-    Route::get('/arsip/{id}/edit', [ArsipController::class, 'edit'])->name('arsip.edit');
-    Route::post('/arsip/{id}/update', [ArsipController::class, 'update'])->name('arsip.update');  
-    Route::delete('/arsip/{id}/delete', [ArsipController::class, 'destroy'])->name('arsip.destroy');
-    Route::get('/arsip/{id}/download', [ArsipController::class, 'downloadFile'])->name('arsip.download');
-
-    Route::get('/arsip/export', [ArsipController::class, 'exportPdf'])->name('arsip.export');
-    Route::get('/arsip/pdf', [ArsipController::class, 'showPdfFilter'])->name('arsip.pdf');
-    Route::get('/arsip/pdf/download', [ArsipController::class, 'downloadPdf'])->name('arsip.pdf.download');
-
-    Route::get('/arsip/rekap', [ArsipController::class, 'showRekapFilter'])->name('arsip.rekap');
+    // 🌍 Desa Berdasarkan Kecamatan (AJAX)
+    Route::get('/get-desa-by-kecamatan/{id}', [ArsipController::class, 'getDesaByKecamatan']);
+    Route::get('/get-desa/{kecamatanId}', [ArsipController::class, 'getDesaByKecamatan']);
 
     // 📤 Dashboard Export
     Route::get('/dashboard/export/excel', [DashboardController::class, 'exportExcel'])->name('dashboard.export.excel');
     Route::get('/dashboard/export/pdf', [DashboardController::class, 'exportPdf'])->name('dashboard.export.pdf');
+
 });
+
 
 // 🔐 Admin Routes (verifikasi user, kelola user)
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {

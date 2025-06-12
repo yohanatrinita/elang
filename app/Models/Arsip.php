@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Arsip extends Model
 {
     protected $fillable = [
+        'desa_id',
         'pelaku_usaha',
         'alamat',
         'jenis_usaha',
@@ -26,6 +27,16 @@ class Arsip extends Model
     public function uploader()
     {
         return $this->belongsTo(User::class, 'uploaded_by');
+    }
+
+    public function desa()
+    {
+        return $this->belongsTo(Desa::class);
+    }
+
+    public function kecamatan()
+    {
+        return $this->desa?->kecamatan(); // relasi melalui desa
     }
 
 }

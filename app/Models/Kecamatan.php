@@ -12,5 +12,11 @@ class Kecamatan extends Model
     {
         return $this->hasMany(Desa::class);
     }
+
+    protected $attributes = [
+    'kabupaten' => 'Kabupaten Bogor',
+    'provinsi' => 'Provinsi Jawa Barat',
+];
+
 }
 

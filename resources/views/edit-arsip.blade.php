@@ -5,8 +5,19 @@
     <div class="container">
         <h3 class="fw-bold mb-4">Edit Arsip</h3>
 
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <form action="{{ route('arsip.update', $arsip->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
+            @method('PUT')
 
             <!-- Tanggal Pengawasan -->
             <div class="mb-3">
@@ -20,101 +31,83 @@
                 <input type="text" class="form-control" id="pelaku_usaha" name="pelaku_usaha" value="{{ old('pelaku_usaha', $arsip->pelaku_usaha) }}" required>
             </div>
 
-            {{-- Provinsi (readonly) --}}
-            <div class="form-group">
-                <label for="provinsi">Provinsi</label>
-                <input type="text" class="form-control" name="provinsi" value="Jawa Barat" readonly>
-            </div>
-
-            {{-- Kabupaten (readonly) --}}
-            <div class="form-group">
-                <label for="kabupaten">Kabupaten</label>
-                <input type="text" class="form-control" name="kabupaten" value="Bogor" readonly>
-            </div>
-
-           <!-- Kecamatan -->
+            <!-- Provinsi -->
             <div class="mb-3">
-                <label for="kecamatan" class="form-label">Kecamatan</label>
-                <select class="form-select" id="kecamatan" name="kecamatan" required>
+                <label class="form-label">Provinsi</label>
+                <input type="text" class="form-control" value="Jawa Barat" readonly>
+            </div>
+
+            <!-- Kabupaten -->
+            <div class="mb-3">
+                <label class="form-label">Kabupaten</label>
+                <input type="text" class="form-control" value="Bogor" readonly>
+            </div>
+
+            <!-- Kecamatan -->
+            <div class="mb-3">
+                <label class="form-label">Kecamatan</label>
+                <select name="kecamatan_id" id="kecamatan_id" class="form-select" required>
                     <option value="">-- Pilih Kecamatan --</option>
                     @foreach ($kecamatans as $kecamatan)
-                        <option value="{{ $kecamatan->id }}">{{ $kecamatan->nama }}</option>
+                        <option value="{{ $kecamatan->id }}" {{ old('kecamatan_id', optional($arsip->desa)->kecamatan_id) == $kecamatan->id ? 'selected' : '' }}>
+                            {{ $kecamatan->nama }}
+                        </option>
                     @endforeach
                 </select>
             </div>
 
             <!-- Desa -->
             <div class="mb-3">
-                <label for="desa" class="form-label">Desa/Kelurahan</label>
-                <select class="form-select" id="desa" name="desa" required>
+                <label class="form-label">Desa/Kelurahan</label>
+                <select name="desa_id" id="desa_id" class="form-select" required>
                     <option value="">-- Pilih Desa/Kelurahan --</option>
+                    {{-- Desa akan di-load via JS --}}
                 </select>
             </div>
 
-
             <!-- Alamat -->
             <div class="mb-3">
-                <label for="alamat" class="form-label">Alamat Lengkap</label>
-                <input type="text" class="form-control" id="alamat" name="alamat" required>
+                <label class="form-label">Alamat Lengkap</label>
+                <input type="text" class="form-control" name="alamat" value="{{ old('alamat', $arsip->alamat) }}" required>
             </div>
-
 
             <!-- Jenis Usaha -->
             <div class="mb-3">
-                <label for="jenis_usaha" class="form-label">Jenis Usaha/Kegiatan</label>
-                <input type="text" class="form-control" id="jenis_usaha" name="jenis_usaha" value="{{ old('jenis_usaha', $arsip->jenis_usaha) }}" required>
+                <label class="form-label">Jenis Usaha/Kegiatan</label>
+                <select name="jenis_usaha" class="form-select" required>
+                    <option value="">-- Pilih Jenis Usaha/Kegiatan --</option>
+                    @foreach(['Agroindustri', 'Fasilitas Pelayanan Kesehatan', 'Jasa Pengelolaan Limbah B3', 'Manufaktur', 'Pertambangan Energi dan Migas', 'Prasarana'] as $jenis)
+                        <option value="{{ $jenis }}" {{ old('jenis_usaha', $arsip->jenis_usaha) == $jenis ? 'selected' : '' }}>{{ $jenis }}</option>
+                    @endforeach
+                </select>
             </div>
 
             <!-- Jenis Dokumen -->
             <div class="mb-3">
-                <label for="jenis_dokumen_lingkungan" class="form-label">Jenis Dokumen Lingkungan</label>
-                <select class="form-select" id="jenis_dokumen_lingkungan" name="jenis_dokumen_lingkungan" required>
+                <label class="form-label">Jenis Dokumen Lingkungan</label>
+                <select name="jenis_dokumen_lingkungan" class="form-select" required>
                     <option value="">-- Pilih Jenis Dokumen --</option>
-                    @foreach(['Amdal', 'UKL-UPL', 'DELH', 'DPLH', 'Tidak Ada'] as $jenis)
-                        <option value="{{ $jenis }}" {{ old('jenis_dokumen_lingkungan', $arsip->jenis_dokumen_lingkungan) == $jenis ? 'selected' : '' }}>
-                            {{ $jenis }}
-                        </option>
+                    @foreach(['Amdal', 'UKL-UPL', 'DELH', 'DPLH', 'Tidak Ada'] as $dok)
+                        <option value="{{ $dok }}" {{ old('jenis_dokumen_lingkungan', $arsip->jenis_dokumen_lingkungan) == $dok ? 'selected' : '' }}>{{ $dok }}</option>
                     @endforeach
                 </select>
             </div>
 
             <!-- Dokumen Lingkungan -->
             <div class="mb-3">
-                <label for="dokumen_lingkungan" class="form-label">Dokumen Lingkungan</label>
-                <input type="text" class="form-control" id="dokumen_lingkungan" name="dokumen_lingkungan" value="{{ old('dokumen_lingkungan', $arsip->dokumen_lingkungan) }}" required>
+                <label class="form-label">Dokumen Lingkungan</label>
+                <input type="text" class="form-control" name="dokumen_lingkungan" value="{{ old('dokumen_lingkungan', $arsip->dokumen_lingkungan) }}" required>
             </div>
 
-            <!-- PPA -->
-            <div class="mb-3">
-                <label for="ppa" class="form-label">PPA</label>
-                <textarea class="form-control numbered" id="ppa" name="ppa" rows="3">{{ old('ppa', $arsip->ppa) }}</textarea>
-            </div>
+            <!-- PPA - PPU - PLB3 - Rekomendasi - Tindak Lanjut -->
+            @foreach (['ppa', 'ppu', 'plb3', 'tindak_lanjut', 'rekomendasi'] as $field)
+                <div class="mb-3">
+                    <label class="form-label text-uppercase">{{ strtoupper(str_replace('_', ' ', $field)) }}</label>
+                    <textarea class="form-control numbered" name="{{ $field }}" rows="3">{{ old($field, $arsip->$field) }}</textarea>
+                </div>
+            @endforeach
 
-            <!-- PPU -->
-            <div class="mb-3">
-                <label for="ppu" class="form-label">PPU</label>
-                <textarea class="form-control numbered" id="ppu" name="ppu" rows="3">{{ old('ppu', $arsip->ppu) }}</textarea>
-            </div>
-
-            <!-- PLB3 -->
-            <div class="mb-3">
-                <label for="plb3" class="form-label">PLB3</label>
-                <textarea class="form-control numbered" id="plb3" name="plb3" rows="3">{{ old('plb3', $arsip->plb3) }}</textarea>
-            </div>
-
-            <!-- Tindak Lanjut -->
-            <div class="mb-3">
-                <label for="tindak_lanjut" class="form-label">Tindak Lanjut</label>
-                <textarea class="form-control numbered" id="tindak_lanjut" name="tindak_lanjut" rows="3">{{ old('tindak_lanjut', $arsip->tindak_lanjut) }}</textarea>
-            </div>
-
-            <!-- Rekomendasi -->
-            <div class="mb-3">
-                <label for="rekomendasi" class="form-label">Rekomendasi</label>
-                <textarea class="form-control numbered" id="rekomendasi" name="rekomendasi" rows="3">{{ old('rekomendasi', $arsip->rekomendasi) }}</textarea>
-            </div>
-
-            <!-- Preview File Lama -->
+            <!-- Preview file lama -->
             @if ($arsip->file_pdf_path)
                 <div class="mb-3">
                     <label class="form-label">Preview File Lama</label>
@@ -122,14 +115,14 @@
                 </div>
             @endif
 
-            <!-- Upload File Baru -->
+            <!-- Upload file baru -->
             <div class="mb-3">
-                <label for="file_pdf" class="form-label">Upload Berita Acara Pengawasan (Opsional)</label>
-                <input type="file" class="form-control" id="file_pdf" name="file_pdf" accept="application/pdf" onchange="previewPdf(this)">
+                <label class="form-label">Upload Berita Acara (Opsional)</label>
+                <input type="file" class="form-control" name="file_pdf" accept="application/pdf" onchange="previewPdf(this)">
                 <iframe id="pdf_preview" class="mt-3" style="width: 100%; height: 400px; display: none;"></iframe>
             </div>
 
-            <!-- Tombol Simpan dan Batal -->
+            <!-- Aksi -->
             <div class="d-flex gap-2">
                 <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
                 <a href="{{ route('arsip') }}" class="btn btn-secondary">Batal</a>
@@ -138,6 +131,7 @@
     </div>
 </section>
 
+{{-- SCRIPT --}}
 <script>
     function previewPdf(input) {
         const file = input.files[0];
@@ -151,6 +145,33 @@
         }
     }
 
+    document.addEventListener("DOMContentLoaded", function () {
+        const kecamatanSelect = document.getElementById('kecamatan_id');
+        const desaSelect = document.getElementById('desa_id');
+        const selectedKecamatan = "{{ optional($arsip->desa)->kecamatan_id }}";
+        const selectedDesa = "{{ $arsip->desa_id }}";
+
+        function loadDesa(kecamatanId, selected = null) {
+            fetch(`/get-desa-by-kecamatan/${kecamatanId}`)
+                .then(response => response.json())
+                .then(data => {
+                    desaSelect.innerHTML = '<option value="">-- Pilih Desa/Kelurahan --</option>';
+                    data.forEach(desa => {
+                        desaSelect.innerHTML += `<option value="${desa.id}" ${desa.id == selected ? 'selected' : ''}>${desa.nama}</option>`;
+                    });
+                });
+        }
+
+        if (selectedKecamatan) {
+            loadDesa(selectedKecamatan, selectedDesa);
+        }
+
+        kecamatanSelect.addEventListener('change', function () {
+            loadDesa(this.value);
+        });
+    });
+
+    // Penomoran otomatis
     document.querySelectorAll('.numbered').forEach(function(textarea) {
         textarea.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
@@ -172,23 +193,4 @@
         });
     });
 </script>
-
-<script>
-    document.getElementById('kecamatan').addEventListener('change', function () {
-        const kecamatanId = this.value;
-        const desaSelect = document.getElementById('desa');
-        desaSelect.innerHTML = '<option value="">Memuat...</option>';
-
-        fetch(`/get-desa/${kecamatanId}`)
-            .then(response => response.json())
-            .then(data => {
-                desaSelect.innerHTML = '<option value="">-- Pilih Desa/Kelurahan --</option>';
-                data.forEach(desa => {
-                    desaSelect.innerHTML += `<option value="${desa.id}">${desa.nama}</option>`;
-                });
-            });
-    });
-</script>
-
-
 @endsection

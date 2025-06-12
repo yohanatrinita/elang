@@ -20,7 +20,8 @@
             </div>
 
             <div class="form-group">
-                <label for="provinsi">Provinsi</label>
+                <label for="
+                ">Provinsi</label>
                 <input type="text" class="form-control" id="provinsi" name="provinsi" value="Jawa Barat" readonly>
             </div>
 
@@ -43,7 +44,7 @@
             <!-- Desa -->
             <div class="mb-3">
                 <label for="desa" class="form-label">Desa/Kelurahan</label>
-                <select class="form-select" id="desa" name="desa" required>
+                <select class="form-select" id="desa" name="desa_id" required>
                     <option value="">-- Pilih Desa/Kelurahan --</option>
                 </select>
             </div>
@@ -59,7 +60,15 @@
             <!-- Jenis Usaha/Kegiatan -->
             <div class="mb-3">
                 <label for="jenis_usaha" class="form-label">Jenis Usaha/Kegiatan</label>
-                <input type="text" class="form-control" id="jenis_usaha" name="jenis_usaha" required>
+                <select name="jenis_usaha" class="form-control" required>
+                    <option value="">-- Pilih Jenis Usaha/Kegiatan --</option>
+                    <option value="Agroindustri" {{ old('jenis_usaha') == 'Agroindustri' ? 'selected' : '' }}>Agroindustri</option>
+                    <option value="Fasilitas Pelayanan Kesehatan" {{ old('jenis_usaha') == 'Fasilitas Pelayanan Kesehatan' ? 'selected' : '' }}>Fasilitas Pelayanan Kesehatan</option>
+                    <option value="Jasa Pengelolaan Limbah B3" {{ old('jenis_usaha') == 'Jasa Pengelolaan Limbah B3' ? 'selected' : '' }}>Jasa Pengelolaan Limbah B3</option>
+                    <option value="Manufaktur" {{ old('jenis_usaha') == 'Manufaktur' ? 'selected' : '' }}>Manufaktur</option>
+                    <option value="Pertambangan Energi dan Migas" {{ old('jenis_usaha') == 'Pertambangan Energi dan Migas' ? 'selected' : '' }}>Pertambangan Energi dan Migas</option>
+                    <option value="Prasarana" {{ old('jenis_usaha') == 'Prasarana' ? 'selected' : '' }}>Prasarana</option>
+                </select>
             </div>
 
             <!-- Jenis Dokumen Lingkungan -->
@@ -113,8 +122,8 @@
 
             <!-- Upload Berita Acara Pengawasan -->
             <div class="mb-3">
-                <label for="file" class="form-label">Upload Berita Acara Pengawasan</label>
-                <input type="file" class="form-control" id="file" name="file" required>
+                <label for="file_pdf" class="form-label">Upload Berita Acara Pengawasan</label>
+                <input type="file" class="form-control" id="file_pdf" name="file_pdf" required>
             </div>
 
             <button type="submit" class="btn btn-primary">Upload</button>
