@@ -74,16 +74,16 @@
             <table class="table table-hover table-striped">
                 <thead class="table-light">
                     <tr>
-                        <th>Nama Dokumen</th>
-                        <th>Tanggal</th>
-                        <th>Waktu</th>
+                        <th>Pelaku Usaha</th>
+                        <th>Tanggal Upload</th>
+                        <th>Waktu Upload</th>
                         <th>Diupload Oleh</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($recentUploads->sortByDesc('created_at') as $doc)
                         <tr>
-                            <td>{{ $doc->dokumen_lingkungan }}</td>
+                            <td>{{ $doc->pelaku_usaha }}</td>
                             <td>{{ $doc->created_at->format('d-m-Y') }}</td>
                             <td>{{ $doc->created_at->timezone('Asia/Jakarta')->format('H:i') }}</td>
                             <td>{{ $doc->uploader->name ?? '-' }}</td>

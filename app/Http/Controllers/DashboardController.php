@@ -31,11 +31,9 @@ class DashboardController extends Controller
 
         // Recent uploads including uploader info
         $recentUploads = Arsip::with('uploader')
-        ->whereYear('tanggal_pengawasan', $selectedYear)
-        ->orderBy('tanggal_pengawasan', 'desc')
-        ->take(5)
-        ->get(); // Ambil semua kolom
-
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
 
         // Document categories pie chart
         $defaultCategories = ['Amdal', 'UKL-UPL', 'DELH', 'DPLH', 'Tidak Ada'];
@@ -68,9 +66,8 @@ class DashboardController extends Controller
         // Dokumen yang diunggah hari ini (berdasarkan tanggal_pengawasan == hari ini)
         $todayDate = Carbon::now('Asia/Jakarta')->toDateString();
 
-        $todayCount = Arsip::whereYear('created_at', $selectedYear)
-                            ->whereDate('created_at', $todayDate)
-                            ->count();
+        $todayCount = Arsip::whereDate('created_at', $todayDate)->count();
+
 
         return view('dashboard', compact(
             'monthlyUploads',
