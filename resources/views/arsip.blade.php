@@ -9,7 +9,7 @@
 @endpush
 
 
-@section('content')
+
 <section class="py-4">
     <div class="container">
 
