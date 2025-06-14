@@ -92,7 +92,7 @@
                             <td style="white-space: pre-line; text-align: justify" class="align-top">
                                 {{ $item->alamat }},
                                 {{ $item->desa->nama ?? '-' }},
-                                Kecamatan {{ $item->desa->kecamatan->nama ?? '-' }},
+                                {{ $item->desa->kecamatan->nama ?? '-' }},
                                 Kabupaten Bogor,
                                 Provinsi Jawa Barat
                             </td>

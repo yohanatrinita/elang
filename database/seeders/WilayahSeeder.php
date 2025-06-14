@@ -53,16 +53,24 @@ class WilayahSeeder extends Seeder
             'Kecamatan Tenjolaya' => ['Desa Cibitung Tengah', 'Desa Cinangneng', 'Desa Gunung Malang', 'Desa Gunung Mulya', 'Desa Situ Daun', 'Desa Tapos 1', 'Desa Tapos 2'],
         ];
 
-        foreach ($data as $kecamatan => $desas) {
-            $kecamatanRecord = Kecamatan::create(['nama' => $kecamatan]);
+            foreach ($data as $kecamatan => $desas) {
+                $kecamatanRecord = Kecamatan::firstOrCreate(
+                    ['nama' => trim($kecamatan)],
+                    [
+                        'kabupaten' => 'Kabupaten Bogor',
+                        'provinsi' => 'Provinsi Jawa Barat'
+                    ]
+                );
 
-            foreach ($desas as $desa) {
-                Desa::create([
-                    'nama' => $desa,
-                    'kecamatan_id' => $kecamatanRecord->id
-                ]);
+                foreach ($desas as $desa) {
+                    Desa::firstOrCreate(
+                        [
+                            'nama' => trim($desa),
+                            'kecamatan_id' => $kecamatanRecord->id
+                        ]
+                    );
+                }
             }
         }
-    }
-}
 
+}
